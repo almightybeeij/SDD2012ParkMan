@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, SDD2012PMActivity!</string>
-    <string name="app_name">SDD2012PM</string>
+    <string name="app_name">UCO Parking</string>
+    <string name="ws_url">http://68.97.99.110:8080</string>
 </resources>
