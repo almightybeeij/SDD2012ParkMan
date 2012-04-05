@@ -27,9 +27,9 @@ import android.os.AsyncTask;
 public class HTTPDataAccess {
 	
 	private String url;
+	private String statement;
+	private String types;
 	
-	private BasicNameValuePair statement;
-	private BasicNameValuePair types;
 	private ArrayList<NameValuePair> bindVariables;
 	
 	private GetJSONArrayListener getJSONListener;
@@ -37,8 +37,10 @@ public class HTTPDataAccess {
 	private Context currentContext;
 	
 	public HTTPDataAccess(String url, GetJSONArrayListener listener) {
+		
 		this.url = url;
 		this.getJSONListener = listener;
+		this.bindVariables = new ArrayList<NameValuePair>();
 	}
 	
 	public String getUrl() {
@@ -49,19 +51,19 @@ public class HTTPDataAccess {
 		this.url = url;
 	}
 
-	public BasicNameValuePair getStatement() {
+	public String getStatement() {
 		return statement;
 	}
 
-	public void setStatement(BasicNameValuePair statement) {
+	public void setStatement(String statement) {
 		this.statement = statement;
 	}
 
-	public BasicNameValuePair getTypes() {
+	public String getTypes() {
 		return types;
 	}
 
-	public void setTypes(BasicNameValuePair types) {
+	public void setTypes(String types) {
 		this.types = types;
 	}
 
@@ -73,6 +75,32 @@ public class HTTPDataAccess {
 		this.bindVariables = bindVariables;
 	}
 
+	public void addNewBindVariable(String name, String value, boolean isHashed) {
+		
+		try {
+			if (isHashed) {
+				bindVariables.add(new BasicNameValuePair(name, this.computeHash(value)));
+			}
+			else {
+				bindVariables.add(new BasicNameValuePair(name, value));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void clearBindVariables()
+	{
+		this.bindVariables.clear();
+	}
+	
+	public void executeSelect()
+	{
+		new ExecuteSelectTask().execute(this.url);
+	}
+	
 	public class ExecuteSelectTask extends AsyncTask<String, Void, JSONArray>
 	{
 		protected JSONArray doInBackground(String... urls)
@@ -123,7 +151,6 @@ public class HTTPDataAccess {
 	        progressDialog.setCancelable(false);
 	        progressDialog.setIndeterminate(true);
 	        progressDialog.show();
-
 	    }
 		
 		protected void onPostExecute(JSONArray jArray)
@@ -164,16 +191,28 @@ public class HTTPDataAccess {
         return sb.toString();
     }
 	
-	public ArrayList<NameValuePair> buildRequestVariables()
-	{
+	public ArrayList<NameValuePair> buildRequestVariables() {
+		
+		String encrypted;
+		MCrypt mcrypt;
 		ArrayList<NameValuePair> requestVariables = new ArrayList<NameValuePair>();
 		
-		requestVariables.add(statement);
-		requestVariables.add(types);
-		
-		for (int index = 0; index < bindVariables.size(); index++)
+		try
 		{
-			requestVariables.add(bindVariables.get(index));
+			mcrypt = new MCrypt();
+			encrypted = MCrypt.bytesToHex(mcrypt.encrypt(""));
+			
+			requestVariables.add(new BasicNameValuePair("stmt", encrypted));
+			requestVariables.add(new BasicNameValuePair("types", types));
+			
+			for (int index = 0; index < bindVariables.size(); index++)
+			{
+				requestVariables.add(bindVariables.get(index));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 		
 		return requestVariables;
