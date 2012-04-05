@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_lbl_title">Login</string>
+    <string name="login_lbl_email">E-mail:</string>
+    <string name="login_lbl_password">Password:</string>
+    <string name="login_btn_submit">Log In</string>
+</resources>
