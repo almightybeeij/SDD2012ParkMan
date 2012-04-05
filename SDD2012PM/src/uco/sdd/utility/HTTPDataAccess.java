@@ -1,4 +1,4 @@
-package uco.sdd.parking;
+package uco.sdd.utility;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -68,3 +68,4 @@ public class HTTPDataAccess {
         return sb.toString();
     }
 }
+

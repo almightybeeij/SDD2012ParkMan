@@ -1,4 +1,4 @@
-package uco.sdd.parking;
+package uco.sdd.utility;
 
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
