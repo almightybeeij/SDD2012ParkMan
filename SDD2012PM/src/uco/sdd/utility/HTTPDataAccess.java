@@ -20,11 +20,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.ResultReceiver;
 
-public class HTTPDataAccess extends ResultReceiver {
+public class HTTPDataAccess {
 	
 	private String url;
 	
@@ -32,9 +32,13 @@ public class HTTPDataAccess extends ResultReceiver {
 	private BasicNameValuePair types;
 	private ArrayList<NameValuePair> bindVariables;
 	
-	public HTTPDataAccess(String url, Handler handler) {
-		super(handler);
+	private GetJSONArrayListener getJSONListener;
+	private ProgressDialog progressDialog;
+	private Context currentContext;
+	
+	public HTTPDataAccess(String url, GetJSONArrayListener listener) {
 		this.url = url;
+		this.getJSONListener = listener;
 	}
 	
 	public String getUrl() {
@@ -109,6 +113,22 @@ public class HTTPDataAccess extends ResultReceiver {
 			}
 			
 			return null;
+		}
+		
+		@Override
+	    public void onPreExecute()
+		{
+	        progressDialog = new ProgressDialog(currentContext);
+	        progressDialog.setMessage("Loading..Please wait..");
+	        progressDialog.setCancelable(false);
+	        progressDialog.setIndeterminate(true);
+	        progressDialog.show();
+
+	    }
+		
+		protected void onPostExecute(JSONArray jArray)
+		{
+			getJSONListener.onRemoteCallComplete(jArray);
 		}
 	}
 	
