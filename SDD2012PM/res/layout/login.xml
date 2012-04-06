@@ -40,8 +40,6 @@
 	<Button android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:text="@string/login_btn_submit"
-	    android:onClick="logIn"
-	    android:paddingBottom="20sp"
-        android:paddingTop="10sp" />
+	    android:onClick="logIn" />
 	
 </LinearLayout>

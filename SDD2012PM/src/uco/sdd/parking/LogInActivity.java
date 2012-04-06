@@ -25,11 +25,17 @@ public class LogInActivity extends Activity {
     
     public void logIn(View view) {
     	
+    	TextView tv_test = (TextView)findViewById(R.id.login_txt_error);
     	EditText et_email = (EditText)this.findViewById(R.id.login_txt_email);
     	EditText et_password = (EditText)this.findViewById(R.id.login_txt_password);
     	
     	String email = et_email.getText().toString();
     	String password = et_password.getText().toString();
+    	
+    	if (email.trim().length() == 0 || password.trim().length() == 0) {
+    		tv_test.setText(getString(R.string.login_msg_required));
+    		return;
+    	}
     	
     	HTTPDataAccess dac = new HTTPDataAccess(this,
     			getString(R.string.url_select), new LogInJSONArrayListener());
@@ -70,7 +76,7 @@ public class LogInActivity extends Activity {
 	    			}
 	    			else
 		    		{
-		    			tv_test.setText("Nice try. Better luck next time!");
+		    			tv_test.setText(getString(R.string.login_msg_invalid));
 		    		}
 	    		}
 	    	}

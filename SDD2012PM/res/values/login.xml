@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="login_act_title">UCO Parking Managment System : Login</string>
+    <string name="login_act_title">UCO Parking Management System : Login</string>
     <string name="login_lbl_title">Login</string>
     <string name="login_lbl_email">E-mail:</string>
     <string name="login_lbl_password">Password:</string>
+    <string name="login_msg_invalid">E-mail / Password combination is invalid.</string>
+    <string name="login_msg_required">E-mail and Password are both required.</string>
     <string name="login_btn_submit">Log In</string>
     <string name="login_smt_authorize">SELECT * FROM CLIENT WHERE EMAIL = ? AND PASSWORD = ?</string>
     <string name="login_smt_authorize_types">ss</string>
