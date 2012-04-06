@@ -31,12 +31,11 @@ public class HTTPDataAccess {
 	private String types;
 	
 	private ArrayList<NameValuePair> bindVariables;
-	
-	private GetJSONArrayListener getJSONListener;
+	private GetJSONListener getJSONListener;
 	private ProgressDialog progressDialog;
 	private Context currentContext;
 	
-	public HTTPDataAccess(Context context, String url, GetJSONArrayListener listener) {
+	public HTTPDataAccess(Context context, String url, GetJSONListener listener) {
 		
 		this.url = url;
 		this.getJSONListener = listener;
@@ -99,8 +98,7 @@ public class HTTPDataAccess {
 	
 	public void executeSelect()
 	{
-		//new ExecuteSelectTask().execute(this.url);
-		new ExecuteSelectTask().execute("http://68.97.98.48:8080/Mobile/executeStmtPrep.php");
+		new ExecuteSelectTask().execute(this.url);
 	}
 	
 	public class ExecuteSelectTask extends AsyncTask<String, Void, JSONArray>

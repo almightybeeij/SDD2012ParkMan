@@ -42,7 +42,7 @@ public class LogInActivity extends Activity {
     	dac.executeSelect();
     }
     
-    private class LogInJSONArrayListener implements GetJSONArrayListener {
+    private class LogInJSONArrayListener implements GetJSONListener {
     	
 	    public void onRemoteCallComplete(JSONArray jArray) {
 	    	

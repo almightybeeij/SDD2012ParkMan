@@ -2,6 +2,6 @@ package uco.sdd.utility;
 
 import org.json.JSONArray;
 
-public interface GetJSONArrayListener {
+public interface GetJSONListener {
 	public void onRemoteCallComplete(JSONArray jsonFromNet);
 }
