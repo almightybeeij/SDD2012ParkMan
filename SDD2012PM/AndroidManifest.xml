@@ -19,5 +19,6 @@
         <activity android:name="SearchActivity"
             android:label="@string/search_act_title">            
         </activity>
+        <activity android:name="ViewParkingMapActivity"></activity>
     </application>
 </manifest>
