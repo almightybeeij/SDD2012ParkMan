@@ -15,13 +15,12 @@ import android.widget.TextView;
 
 public class LogInActivity extends Activity {
 	
-	static final int RESULT_CLOSE_ALL = 0;
-	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        ((ParkingApplication)getApplication()).setResultCloseAll(0);
     }
     
     public void logIn(View view) {
@@ -76,7 +75,7 @@ public class LogInActivity extends Activity {
 	    	}
 	    	
 	    	Intent i = new Intent(getApplicationContext(), MainActivity.class);
-	    	startActivityForResult(i, RESULT_CLOSE_ALL);
+	    	startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
 	    	i = null;
 	    }
     }
@@ -84,11 +83,12 @@ public class LogInActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	
-        switch(resultCode)
+    	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
+    	
+        if (resultCode == closeAll)
         {
-        	case RESULT_CLOSE_ALL:
-        		setResult(RESULT_CLOSE_ALL);
-        		finish();
+        	setResult(closeAll);
+        	finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

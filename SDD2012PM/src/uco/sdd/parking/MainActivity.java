@@ -9,9 +9,7 @@ import android.widget.ListView;
 
 public class MainActivity extends ListActivity
 {
-	static final int RESULT_CLOSE_ALL = 0;
-	
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
@@ -23,11 +21,12 @@ public class MainActivity extends ListActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	
-        switch(resultCode)
+    	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
+    	
+        if (resultCode == closeAll)
         {
-        	case RESULT_CLOSE_ALL:
-        		setResult(RESULT_CLOSE_ALL);
-        		finish();
+        	setResult(closeAll);
+        	finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -46,7 +45,7 @@ public class MainActivity extends ListActivity
 				launchActivity("SearchActivity");
 				break;
 			case 2:
-				this.setResult(RESULT_CLOSE_ALL);
+				this.setResult(((ParkingApplication)getApplication()).getResultCloseAll());
 				this.finish();
 				break;
 		}
