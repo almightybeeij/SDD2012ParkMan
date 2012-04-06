@@ -32,7 +32,7 @@ public class LogInActivity extends Activity {
     	String email = et_email.getText().toString();
     	String password = et_password.getText().toString();
     	
-    	if (email.trim().length() == 0 || password.trim().length() == 0) {
+    	if ((email.trim().length() == 0) || (password.trim().length() == 0)) {
     		tv_test.setText(getString(R.string.login_msg_required));
     		return;
     	}
