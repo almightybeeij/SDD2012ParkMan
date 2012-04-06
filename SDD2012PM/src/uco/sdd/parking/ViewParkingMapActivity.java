@@ -44,17 +44,4 @@ public class ViewParkingMapActivity extends MapActivity {
 		
         mapView.invalidate();
 	}
-
-	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	
-    	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
-    	
-        if (resultCode == closeAll)
-        {
-        	setResult(closeAll);
-        	finish();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

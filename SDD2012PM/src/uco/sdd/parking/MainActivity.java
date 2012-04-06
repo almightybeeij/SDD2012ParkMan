@@ -50,12 +50,12 @@ public class MainActivity extends ListActivity
 
 			case 0:
 				i = new Intent(getApplicationContext(), ViewParkingMapActivity.class);
-				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
+				startActivity(i);
 				i = null;
 				break;
 			case 1:
 				i = new Intent(getApplicationContext(), SearchActivity.class);
-				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
+				startActivity(i);
 				i = null;
 				break;
 			case 2:
