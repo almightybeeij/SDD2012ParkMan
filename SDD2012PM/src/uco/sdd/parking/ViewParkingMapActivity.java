@@ -5,6 +5,7 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 public class ViewParkingMapActivity extends MapActivity {
@@ -22,7 +23,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		
 	    super.onCreate(savedInstanceState);
-	
+	    setContentView(R.layout.viewmap);
+	    
 	    mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         
@@ -43,4 +45,16 @@ public class ViewParkingMapActivity extends MapActivity {
         mapView.invalidate();
 	}
 
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	
+    	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
+    	
+        if (resultCode == closeAll)
+        {
+        	setResult(closeAll);
+        	finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

@@ -43,15 +43,20 @@ public class MainActivity extends ListActivity
     @Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
     	
+    	Intent i = null;
 		super.onListItemClick(l, v, position, id);
 		
 		switch (position) {
 
 			case 0:
-				launchActivity("SearchActivity");
+				i = new Intent(getApplicationContext(), ViewParkingMapActivity.class);
+				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
+				i = null;
 				break;
 			case 1:
-				launchActivity("SearchActivity");
+				i = new Intent(getApplicationContext(), SearchActivity.class);
+				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
+				i = null;
 				break;
 			case 2:
 				this.setResult(((ParkingApplication)getApplication()).getResultCloseAll());
@@ -59,16 +64,4 @@ public class MainActivity extends ListActivity
 				break;
 		}
 	}
-    
-    private void launchActivity(String activityName) {
-    	
-    	try {
-			Class<?> cl = Class.forName("uco.sdd.parking." + activityName);
-			Intent intent = new Intent(this, cl);
-			startActivity(intent);
-		}
-		catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-    }
 }
