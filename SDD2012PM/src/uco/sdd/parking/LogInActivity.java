@@ -1,7 +1,8 @@
 package uco.sdd.parking;
 
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import uco.sdd.utility.*;
 
@@ -9,8 +10,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
-public class LogInActivity extends Activity implements GetJSONArrayListener {
+public class LogInActivity extends Activity {
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +29,8 @@ public class LogInActivity extends Activity implements GetJSONArrayListener {
     	String email = et_email.getText().toString();
     	String password = et_password.getText().toString();
     	
-    	HTTPDataAccess dac = new HTTPDataAccess(getString(R.string.url_select), this);
+    	HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new LogInJSONArrayListener());
     	
     	dac.setStatement("select * from client where email = ? and password = ?");
     	dac.setTypes("ss");
@@ -36,8 +39,37 @@ public class LogInActivity extends Activity implements GetJSONArrayListener {
     	dac.executeSelect();
     }
     
-    public void onRemoteCallComplete(JSONArray jArray)
-    {
+    private class LogInJSONArrayListener implements GetJSONArrayListener {
     	
+	    public void onRemoteCallComplete(JSONArray jArray) {
+	    	
+	    	try
+	    	{	
+	    		TextView tv_test = (TextView)findViewById(R.id.login_txt_test);
+	    		
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+				    	for(int index = 0; index < jArray.length(); index++)
+				    	{	
+				        	JSONObject json_data = jArray.getJSONObject(index);
+				        	
+				        	String firstName = json_data.getString("firstName");
+				        	String lastName = json_data.getString("lastName");
+				        	
+				        	tv_test.setText("Welcome back, " + firstName + " " + lastName + "!");
+				    	}
+	    			}
+	    			else
+		    		{
+		    			tv_test.setText("Nice try. Better luck next time!");
+		    		}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+	    }
     }
 }

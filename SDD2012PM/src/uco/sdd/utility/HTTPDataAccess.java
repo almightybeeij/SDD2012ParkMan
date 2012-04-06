@@ -36,11 +36,12 @@ public class HTTPDataAccess {
 	private ProgressDialog progressDialog;
 	private Context currentContext;
 	
-	public HTTPDataAccess(String url, GetJSONArrayListener listener) {
+	public HTTPDataAccess(Context context, String url, GetJSONArrayListener listener) {
 		
 		this.url = url;
 		this.getJSONListener = listener;
 		this.bindVariables = new ArrayList<NameValuePair>();
+		this.currentContext = context;
 	}
 	
 	public String getUrl() {
@@ -98,7 +99,8 @@ public class HTTPDataAccess {
 	
 	public void executeSelect()
 	{
-		new ExecuteSelectTask().execute(this.url);
+		//new ExecuteSelectTask().execute(this.url);
+		new ExecuteSelectTask().execute("http://68.97.98.48:8080/Mobile/executeStmtPrep.php");
 	}
 	
 	public class ExecuteSelectTask extends AsyncTask<String, Void, JSONArray>
@@ -112,6 +114,7 @@ public class HTTPDataAccess {
 		{
 			HttpClient httpclient = new DefaultHttpClient();
     	    HttpPost httppost = new HttpPost(url);
+    	    JSONArray jArray = null;
     	    
 			try
 			{
@@ -126,9 +129,7 @@ public class HTTPDataAccess {
         	    	InputStream istream = entity.getContent();
         	    	String result = convertStreamToString(istream);
         	    	
-        	    	JSONArray jArray = new JSONArray(result);
-        	    	
-        	    	return jArray;
+        	    	jArray = new JSONArray(result);
         	    }				
 			}
 			catch (JSONException e)
@@ -140,7 +141,7 @@ public class HTTPDataAccess {
 				e.printStackTrace();
 			}
 			
-			return null;
+			return jArray;
 		}
 		
 		@Override
@@ -156,6 +157,7 @@ public class HTTPDataAccess {
 		protected void onPostExecute(JSONArray jArray)
 		{
 			getJSONListener.onRemoteCallComplete(jArray);
+			progressDialog.dismiss();
 		}
 	}
 	
@@ -200,7 +202,7 @@ public class HTTPDataAccess {
 		try
 		{
 			mcrypt = new MCrypt();
-			encrypted = MCrypt.bytesToHex(mcrypt.encrypt(""));
+			encrypted = MCrypt.bytesToHex(mcrypt.encrypt(statement));
 			
 			requestVariables.add(new BasicNameValuePair("stmt", encrypted));
 			requestVariables.add(new BasicNameValuePair("types", types));

@@ -32,4 +32,9 @@
 	    android:text="@string/login_btn_submit"
 	    android:onClick="logIn" />
 	
+	<TextView android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/login_txt_test"
+	    android:text="@string/app_name" />
+	
 </LinearLayout>
