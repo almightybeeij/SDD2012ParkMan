@@ -23,7 +23,7 @@ public class LogInActivity extends Activity {
         ((ParkingApplication)getApplication()).setResultCloseAll(0);
     }
     
-    public void logIn(View view) {
+    public void logInOnClick(View view) {
     	
     	TextView tv_test = (TextView)findViewById(R.id.login_txt_error);
     	EditText et_email = (EditText)this.findViewById(R.id.login_txt_email);
