@@ -34,7 +34,6 @@
 	
 	<TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
-	    android:id="@+id/login_txt_test"
-	    android:text="@string/app_name" />
+	    android:id="@+id/login_txt_test" />
 	
 </LinearLayout>
