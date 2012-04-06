@@ -32,10 +32,11 @@ public class LogInActivity extends Activity {
     	HTTPDataAccess dac = new HTTPDataAccess(this,
     			getString(R.string.url_select), new LogInJSONArrayListener());
     	
-    	dac.setStatement("select * from client where email = ? and password = ?");
-    	dac.setTypes("ss");
+    	dac.setStatement(getString(R.string.login_smt_authorize));
+    	dac.setTypes(getString(R.string.login_smt_authorize_types));
     	dac.addNewBindVariable("email", email, false);
     	dac.addNewBindVariable("password", password, true);
+    	
     	dac.executeSelect();
     }
     
