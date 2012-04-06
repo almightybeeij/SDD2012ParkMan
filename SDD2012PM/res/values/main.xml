@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="main_mnu_items">
+        <item>View Parking Map</item>
+        <item>Search for Parking</item>
+        <item>Quit</item>
+    </string-array>
+</resources>
