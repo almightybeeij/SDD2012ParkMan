@@ -19,7 +19,7 @@ public class LogInActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 		
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+        setContentView(R.layout.login_layout);
         ((ParkingApplication)getApplication()).setResultCloseAll(0);
     }
     

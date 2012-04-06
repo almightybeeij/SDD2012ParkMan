@@ -14,7 +14,7 @@ public class MainActivity extends ListActivity
     public void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_layout);
         
         String[] menuItems = getResources().getStringArray(R.array.main_mnu_items);
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));

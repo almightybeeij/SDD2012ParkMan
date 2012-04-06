@@ -22,7 +22,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.viewmap);
+	    setContentView(R.layout.viewmap_layout);
 	    
 	    mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
