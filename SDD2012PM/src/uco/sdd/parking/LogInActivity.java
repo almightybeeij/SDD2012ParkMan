@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 public class LogInActivity extends Activity {
 	
+	static final int RESULT_CLOSE_ALL = 0;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		
@@ -74,8 +76,20 @@ public class LogInActivity extends Activity {
 	    	}
 	    	
 	    	Intent i = new Intent(getApplicationContext(), MainActivity.class);
-	    	startActivity(i);
+	    	startActivityForResult(i, RESULT_CLOSE_ALL);
 	    	i = null;
 	    }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	
+        switch(resultCode)
+        {
+        	case RESULT_CLOSE_ALL:
+        		setResult(RESULT_CLOSE_ALL);
+        		finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

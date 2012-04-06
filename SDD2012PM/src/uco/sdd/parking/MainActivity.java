@@ -9,6 +9,8 @@ import android.widget.ListView;
 
 public class MainActivity extends ListActivity
 {
+	static final int RESULT_CLOSE_ALL = 0;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -16,6 +18,18 @@ public class MainActivity extends ListActivity
         
         String[] menuItems = getResources().getStringArray(R.array.main_mnu_items);
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	
+        switch(resultCode)
+        {
+        	case RESULT_CLOSE_ALL:
+        		setResult(RESULT_CLOSE_ALL);
+        		finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
     
     @Override
@@ -32,6 +46,7 @@ public class MainActivity extends ListActivity
 				launchActivity("SearchActivity");
 				break;
 			case 2:
+				this.setResult(RESULT_CLOSE_ALL);
 				this.finish();
 				break;
 		}
