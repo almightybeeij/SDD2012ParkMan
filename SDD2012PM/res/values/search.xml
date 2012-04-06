@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_act_title">Search for Parking</string>
+    <string name="search_lbl_title">Search</string>
+    <string name="search_lbl_parkinglot">Parking Lot:</string>
+    <string name="search_lbl_building">Building:</string>
+    <string name="search_msg_required">Search parameters are required.</string>
+    <string name="search_btn_submit">Search</string>
+    <string name="search_smt_search">SELECT * FROM CLIENT WHERE EMAIL = ? AND PASSWORD = ?</string>
+    <string name="search_smt_serach_types">ss</string>
 </resources>

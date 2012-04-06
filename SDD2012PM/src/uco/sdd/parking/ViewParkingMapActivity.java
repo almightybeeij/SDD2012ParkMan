@@ -5,7 +5,6 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 public class ViewParkingMapActivity extends MapActivity {
@@ -39,9 +38,5 @@ public class ViewParkingMapActivity extends MapActivity {
  
         mc.animateTo(p);
         mc.setZoom(19); 
-        
-        mapView.setStreetView(true);
-		
-        mapView.invalidate();
 	}
 }
