@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class MainActivity extends ListActivity
 {
@@ -13,9 +14,17 @@ public class MainActivity extends ListActivity
     public void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
         
         String[] menuItems = getResources().getStringArray(R.array.main_mnu_items);
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));
+        
+        Bundle extras = getIntent().getExtras();
+        String fName = extras.getString("firstName");
+        String lName = extras.getString("lastName");
+        
+        TextView tv_Welcome = (TextView)findViewById(R.id.main_tvw_welcome);
+        tv_Welcome.setText("Welcome Back " + fName + " " + lName + "!");
     }
     
     @Override

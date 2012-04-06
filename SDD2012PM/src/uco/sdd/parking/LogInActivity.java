@@ -67,10 +67,12 @@ public class LogInActivity extends Activity {
 				        	String firstName = json_data.getString("firstName");
 				        	String lastName = json_data.getString("lastName");
 				        	
-				        	tv_test.setText("Welcome back, " + firstName + " " + lastName + "!");
-				        	
 				        	Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				        	i.putExtra("firstName", firstName);
+					    	i.putExtra("lastName", lastName);
+					    	
 					    	startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
+					    	
 					    	i = null;
 				    	}
 	    			}

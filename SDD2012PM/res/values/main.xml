@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="main_img_desc_divider">
+        dividing line
+    </string>
     <string-array name="main_mnu_items">
         <item>View Parking Map</item>
         <item>Search for Parking</item>
