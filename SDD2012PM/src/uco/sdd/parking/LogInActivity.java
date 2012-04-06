@@ -48,7 +48,7 @@ public class LogInActivity extends Activity {
 	    	
 	    	try
 	    	{	
-	    		TextView tv_test = (TextView)findViewById(R.id.login_txt_test);
+	    		TextView tv_test = (TextView)findViewById(R.id.login_txt_error);
 	    		
 	    		if (jArray != null)
 	    		{

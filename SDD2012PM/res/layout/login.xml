@@ -4,6 +4,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
     
+    <TextView android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/login_txt_error"
+	    android:paddingTop="10sp"
+	    android:textColor="@color/red"/>
+    
     <TextView android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="25sp"
@@ -37,9 +43,5 @@
 	    android:onClick="logIn"
 	    android:paddingBottom="20sp"
         android:paddingTop="10sp" />
-	
-	<TextView android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-	    android:id="@+id/login_txt_test" />
 	
 </LinearLayout>
