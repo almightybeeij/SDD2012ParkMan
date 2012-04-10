@@ -44,6 +44,18 @@ public class SearchActivity extends Activity {
 		
 	}
 	
+	public void selectParkingLots(String building)
+	{
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new SearchParkingLotJSONListener());
+	    
+	    dac.setStatement(getString(R.string.search_smt_parkinglots));
+	    dac.setTypes(getString(R.string.search_smt_parkinglots_types));
+    	dac.addNewBindVariable("building", building, false);
+    	
+    	dac.executeSelect();
+	}
+	
 	private class SearchBuildingJSONListener implements GetJSONListener
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {
@@ -54,18 +66,19 @@ public class SearchActivity extends Activity {
 	    		{
 	    			if (jArray.length() > 0)
 	    			{
+	    				buildings.add("");
 				    	for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		
 				    		buildings.add(json_data.getString("name"));
 				    	}
 				    	
 				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
 				    			R.layout.search_spinner_item, R.id.search_spn_itemtext, buildings);
+				    	
 				    	Spinner spinnerBuildings = (Spinner)findViewById(R.id.search_spn_building);
-				    	spinnerBuildings.setOnItemSelectedListener(new MyOnItemSelectedListener());
 				    	spinnerBuildings.setAdapter(adapter);
+				    	spinnerBuildings.setOnItemSelectedListener(new MyOnItemSelectedListener());
 	    			}
 	    		}
 	    	}
@@ -88,16 +101,14 @@ public class SearchActivity extends Activity {
 				    	for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		
-				    		parkingLots.add(json_data.getString("name"));
+				    		parkingLots.add(json_data.getString("LOTID"));
 				    	}
 				    	
 				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
 				    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
 				    	
-				    	Spinner spinnerBuildings = (Spinner)findViewById(R.id.search_spn_building);
-				    	spinnerBuildings.setOnItemSelectedListener(new MyOnItemSelectedListener());
-				    	spinnerBuildings.setAdapter(adapter);
+				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
+				    	spinnerParkingLots.setAdapter(adapter);
 	    			}
 	    		}
 	    	}
@@ -114,14 +125,10 @@ public class SearchActivity extends Activity {
 	    {
 	    	String buildingValue = parent.getItemAtPosition(pos).toString();
 	    	
-	    	HTTPDataAccess dac = new HTTPDataAccess(getApplicationContext(),
-	    			getString(R.string.url_select), new SearchParkingLotJSONListener());
-		    
-		    dac.setStatement(getString(R.string.search_smt_parkinglots));
-		    dac.setTypes(getString(R.string.search_smt_parkinglots_types));
-	    	dac.addNewBindVariable("building", buildingValue, false);
-	    	
-	    	dac.executeSelect();
+	    	if (buildingValue.trim() != "")
+	    	{
+	    		selectParkingLots(buildingValue);
+	    	}
 	    }
 
 	    public void onNothingSelected(AdapterView<?> parent) {

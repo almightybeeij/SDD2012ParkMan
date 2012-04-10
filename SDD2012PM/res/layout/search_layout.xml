@@ -19,7 +19,8 @@
     
     <TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
-	    android:text="@string/search_lbl_building" />
+	    android:text="@string/search_lbl_building"
+	    android:layout_marginLeft="2sp" />
     
 	<Spinner android:id="@+id/search_spn_building"
         android:layout_width="fill_parent"
@@ -31,7 +32,8 @@
     
 	<TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
-	    android:text="@string/search_lbl_parkinglot" />
+	    android:text="@string/search_lbl_parkinglot"
+	    android:layout_marginLeft="2sp" />
 	
 	<Spinner android:id="@+id/search_spn_parkinglot"
         android:layout_width="fill_parent"
