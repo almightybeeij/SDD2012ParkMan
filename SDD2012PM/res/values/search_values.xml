@@ -8,4 +8,10 @@
     <string name="search_btn_submit">Search</string>
     <string name="search_smt_building">SELECT * FROM BUILDINGS WHERE ?</string>
     <string name="search_smt_building_types">i</string>
+    <string name="search_smt_parkinglots">
+        SELECT PARKINGLOT_LOTID FROM LOTPROXIMITY, BUILDINGS
+		WHERE LOTPROXIMITY.BUILDINGS_BUILDINGCODE = BUILDINGS.BUILDINGCODE
+		AND BUILDINGS.NAME = ?
+    </string>
+    <string name="search_smt_parkinglots_types">s</string>
 </resources>
