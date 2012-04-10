@@ -14,4 +14,8 @@
 		AND BUILDINGS.NAME = ?
     </string>
     <string name="search_smt_parkinglots_types">s</string>
+    <string name="search_smt_parking">
+        SELECT * FROM PARKINGSPACE WHERE PARKINGLOT_LOTID = ? AND AVAILABLE = ?
+    </string>
+    <string name="search_smt_parking_types">ii</string>
 </resources>

@@ -15,9 +15,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SearchActivity extends Activity {
 
+	private String parkingLot;
+	
 	private ArrayList<String> buildings;
 	private ArrayList<String> parkingLots;
 	
@@ -42,6 +45,15 @@ public class SearchActivity extends Activity {
 
 	public void searchOnClick(View view) {
 		
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new SearchParkingJSONListener());
+	    
+	    dac.setStatement(getString(R.string.search_smt_parking));
+	    dac.setTypes(getString(R.string.search_smt_parking_types));
+    	dac.addNewBindVariable("lotId", parkingLot, false);
+    	dac.addNewBindVariable("available", "1", false);
+    	
+    	dac.executeSelect();		
 	}
 	
 	public void selectParkingLots(String building)
@@ -78,7 +90,35 @@ public class SearchActivity extends Activity {
 				    	
 				    	Spinner spinnerBuildings = (Spinner)findViewById(R.id.search_spn_building);
 				    	spinnerBuildings.setAdapter(adapter);
-				    	spinnerBuildings.setOnItemSelectedListener(new MyOnItemSelectedListener());
+				    	spinnerBuildings.setOnItemSelectedListener(new OnBuildingItemSelectedListener());
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
+	private class SearchParkingJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			    	
+	    	try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+	    				String parkingAvailable = null;
+	    				
+				    	for(int index = 0; index < jArray.length(); index++)
+				    	{
+				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		parkingAvailable = parkingAvailable + json_data.getString("spaceId")+ " ";
+				    	}
+				    	TextView tvTest = (TextView)findViewById(R.id.search_txt_error);
+				    	tvTest.setText(parkingAvailable);
 	    			}
 	    		}
 	    	}
@@ -101,7 +141,7 @@ public class SearchActivity extends Activity {
 				    	for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		parkingLots.add(json_data.getString("LOTID"));
+				    		parkingLots.add("Parking Lot " + json_data.getString("LOTID"));
 				    	}
 				    	
 				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
@@ -109,6 +149,7 @@ public class SearchActivity extends Activity {
 				    	
 				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
 				    	spinnerParkingLots.setAdapter(adapter);
+				    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
 	    			}
 	    		}
 	    	}
@@ -118,7 +159,7 @@ public class SearchActivity extends Activity {
 		}
 	}
 	
-	public class MyOnItemSelectedListener implements OnItemSelectedListener {
+	public class OnBuildingItemSelectedListener implements OnItemSelectedListener {
 
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id)
@@ -128,6 +169,25 @@ public class SearchActivity extends Activity {
 	    	if (buildingValue.trim() != "")
 	    	{
 	    		selectParkingLots(buildingValue);
+	    	}
+	    }
+
+	    public void onNothingSelected(AdapterView<?> parent) {
+	      // Do nothing.
+	    }
+	}
+	
+	public class OnParkingLotItemSelectedListener implements OnItemSelectedListener {
+
+	    public void onItemSelected(AdapterView<?> parent,
+	        View view, int pos, long id)
+	    {
+	    	String parkingLotValue = parent.getItemAtPosition(pos).toString();
+	    	
+	    	if (parkingLotValue.trim() != "")
+	    	{
+	    		parkingLot = parkingLotValue.substring(12,
+	    				parkingLotValue.length());
 	    	}
 	    }
 
