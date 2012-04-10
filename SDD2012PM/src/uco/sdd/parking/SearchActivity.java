@@ -33,6 +33,9 @@ public class SearchActivity extends Activity {
 	    buildings = new ArrayList<String>();
 	    parkingLots = new ArrayList<String>();
 	    
+	    Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
+	    spinnerParkingLots.setEnabled(false);
+	    
 	    HTTPDataAccess dac = new HTTPDataAccess(this,
     			getString(R.string.url_select), new SearchBuildingJSONListener());
 	    
@@ -66,6 +69,18 @@ public class SearchActivity extends Activity {
     	dac.addNewBindVariable("building", building, false);
     	
     	dac.executeSelect();
+	}
+	
+	private void clearParkingLots()
+	{
+		parkingLots.clear();
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
+    	
+    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
+    	spinnerParkingLots.setAdapter(adapter);
+    	spinnerParkingLots.setEnabled(false);
 	}
 	
 	private class SearchBuildingJSONListener implements GetJSONListener
@@ -150,6 +165,7 @@ public class SearchActivity extends Activity {
 				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
 				    	spinnerParkingLots.setAdapter(adapter);
 				    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
+				    	spinnerParkingLots.setEnabled(true);
 	    			}
 	    		}
 	    	}
@@ -169,6 +185,10 @@ public class SearchActivity extends Activity {
 	    	if (buildingValue.trim() != "")
 	    	{
 	    		selectParkingLots(buildingValue);
+	    	}
+	    	else
+	    	{
+	    		clearParkingLots();
 	    	}
 	    }
 

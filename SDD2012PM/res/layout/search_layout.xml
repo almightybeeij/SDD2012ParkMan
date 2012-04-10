@@ -41,7 +41,7 @@
         android:prompt="@string/search_lbl_parkinglot"
         android:clipChildren="false"
         android:clipToPadding="true"
-        android:layout_marginBottom="15sp"/>
+        android:layout_marginBottom="15sp" />
 	
 	<Button android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
