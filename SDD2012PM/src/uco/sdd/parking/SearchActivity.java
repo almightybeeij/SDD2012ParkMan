@@ -20,9 +20,11 @@ import android.widget.TextView;
 public class SearchActivity extends Activity {
 
 	private String parkingLot;
+	private String building;
 	
 	private ArrayList<String> buildings;
 	private ArrayList<String> parkingLots;
+	private ArrayList<String> parkingTypes;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class SearchActivity extends Activity {
 	    
 	    buildings = new ArrayList<String>();
 	    parkingLots = new ArrayList<String>();
+	    parkingTypes = new ArrayList<String>();
 	    
 	    Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
 	    spinnerParkingLots.setEnabled(false);
@@ -59,14 +62,31 @@ public class SearchActivity extends Activity {
     	dac.executeSelect();		
 	}
 	
-	public void selectParkingLots(String building)
+	public void selectParkingTypes(String building)
 	{
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new SearchParkingTypeJSONListener());
+	    
+	    dac.setStatement(getString(R.string.search_smt_parkingtypes));
+	    dac.setTypes(getString(R.string.search_smt_parkingtypes_types));
+    	dac.addNewBindVariable("building", building, false);
+    	
+    	dac.executeSelect();
+	}
+	
+	public void selectParkingLots(String building, boolean studentLot, boolean facultyLot)
+	{
+		int isStudent = studentLot ? 1 : 0;
+		int isFaculty = facultyLot ? 1 : 0;
+		
 		HTTPDataAccess dac = new HTTPDataAccess(this,
     			getString(R.string.url_select), new SearchParkingLotJSONListener());
 	    
 	    dac.setStatement(getString(R.string.search_smt_parkinglots));
 	    dac.setTypes(getString(R.string.search_smt_parkinglots_types));
     	dac.addNewBindVariable("building", building, false);
+    	dac.addNewBindVariable("studentLot", Integer.toString(isStudent), false);
+    	dac.addNewBindVariable("facultyLot", Integer.toString(isFaculty), false);
     	
     	dac.executeSelect();
 	}
@@ -115,6 +135,79 @@ public class SearchActivity extends Activity {
 		}
 	}
 	
+	private class SearchParkingTypeJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			 
+			try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+				    	for(int index = 0; index < jArray.length(); index++)
+				    	{
+				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		parkingTypes.add("");
+				    		
+				    		if (json_data.getInt("studentLots") > 0)
+				    		{
+				    			parkingTypes.add("Student");
+				    		}
+				    		if (json_data.getInt("facultyLots") > 0)
+				    		{
+				    			parkingTypes.add("Faculty");
+				    		}
+				    	}
+				    	
+				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+				    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingTypes);
+				    	
+				    	Spinner spinnerParkingTypes = (Spinner)findViewById(R.id.search_spn_parkingtype);
+				    	spinnerParkingTypes.setAdapter(adapter);
+				    	spinnerParkingTypes.setOnItemSelectedListener(new OnParkingTypeItemSelectedListener());
+				    	spinnerParkingTypes.setEnabled(true);
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
+	private class SearchParkingLotJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			 
+			try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+				    	for(int index = 0; index < jArray.length(); index++)
+				    	{
+				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		parkingLots.add("Parking Lot " + json_data.getString("lotid"));
+				    	}
+				    	
+				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+				    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
+				    	
+				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
+				    	spinnerParkingLots.setAdapter(adapter);
+				    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
+				    	spinnerParkingLots.setEnabled(true);
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
 	private class SearchParkingJSONListener implements GetJSONListener
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {
@@ -143,38 +236,6 @@ public class SearchActivity extends Activity {
 		}
 	}
 	
-	private class SearchParkingLotJSONListener implements GetJSONListener
-	{
-		public void onRemoteCallComplete(JSONArray jArray) {
-			    	
-	    	try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
-				    	for(int index = 0; index < jArray.length(); index++)
-				    	{
-				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		parkingLots.add("Parking Lot " + json_data.getString("LOTID"));
-				    	}
-				    	
-				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-				    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
-				    	
-				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
-				    	spinnerParkingLots.setAdapter(adapter);
-				    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
-				    	spinnerParkingLots.setEnabled(true);
-	    			}
-	    		}
-	    	}
-	    	catch (JSONException e)	{
-	    		e.printStackTrace();
-	    	}
-		}
-	}
-	
 	public class OnBuildingItemSelectedListener implements OnItemSelectedListener {
 
 	    public void onItemSelected(AdapterView<?> parent,
@@ -184,11 +245,33 @@ public class SearchActivity extends Activity {
 	    	
 	    	if (buildingValue.trim() != "")
 	    	{
-	    		selectParkingLots(buildingValue);
+	    		building = buildingValue;
+	    		selectParkingTypes(buildingValue);
 	    	}
 	    	else
 	    	{
 	    		clearParkingLots();
+	    	}
+	    }
+
+	    public void onNothingSelected(AdapterView<?> parent) {
+	      // Do nothing.
+	    }
+	}
+	
+	public class OnParkingTypeItemSelectedListener implements OnItemSelectedListener {
+
+	    public void onItemSelected(AdapterView<?> parent,
+	        View view, int pos, long id)
+	    {
+	    	String parkingTypeValue = parent.getItemAtPosition(pos).toString();
+	    	
+	    	if (parkingTypeValue.trim() != "")
+	    	{
+	    		if (parkingTypeValue == "Student")
+	    			selectParkingLots(building, true, false);
+	    		else
+	    			selectParkingLots(building, false, true);
 	    	}
 	    }
 

@@ -7,16 +7,26 @@
     <string name="search_lbl_building">Select Building</string>
     <string name="search_msg_required">Search parameters are required.</string>
     <string name="search_btn_submit">Search</string>
-    <string name="search_smt_building">SELECT * FROM BUILDINGS WHERE ?</string>
+    <string name="search_smt_building">select * from buildings where ?</string>
     <string name="search_smt_building_types">i</string>
-    <string name="search_smt_parkinglots">
-        SELECT PARKINGLOT_LOTID AS LOTID FROM LOTPROXIMITY, BUILDINGS
-		WHERE LOTPROXIMITY.BUILDINGS_BUILDINGCODE = BUILDINGS.BUILDINGCODE
-		AND BUILDINGS.NAME = ?
+    <string name="search_smt_parkingtypes">
+        select sum(studentLot) as studentLots, sum(facultyLot) as facultyLots
+		from parkinglot, lotproximity, buildings
+		where parkinglot.lotid = lotproximity.parkinglot_lotid
+		and lotproximity.buildings_buildingcode = buildings.buildingcode
+		and buildings.name = ?
     </string>
-    <string name="search_smt_parkinglots_types">s</string>
+    <string name="search_smt_parkingtypes_types">s</string>
+    <string name="search_smt_parkinglots">
+        select parkinglot_lotid as lotid
+		from parkinglot, lotproximity, buildings
+		where parkinglot.lotid = lotproximity.parkinglot_lotid
+		and lotproximity.buildings_buildingcode = buildings.buildingcode
+		and buildings.name = ? and parkinglot.studentLot = ? and parkingLot.facultyLot = ?
+    </string>
+    <string name="search_smt_parkinglots_types">sii</string>
     <string name="search_smt_parking">
-        SELECT * FROM PARKINGSPACE WHERE PARKINGLOT_LOTID = ? AND AVAILABLE = ?
+        select * from parkingspace where parkinglot_lotid = ? and available = ?
     </string>
     <string name="search_smt_parking_types">ii</string>
 </resources>
