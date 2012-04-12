@@ -2,6 +2,13 @@ package uco.sdd.parking;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import uco.sdd.utility.GetJSONListener;
+import uco.sdd.utility.HTTPDataAccess;
+
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -54,6 +61,15 @@ public class ViewParkingMapActivity extends MapActivity {
  
         mc.animateTo(p);
         mc.setZoom(19); 
+        
+        HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new StudentLotCoordinatesJSONListener());
+	    
+	    dac.setStatement(getString(R.string.viewparking_smt_lotstudent));
+	    dac.setTypes(getString(R.string.viewparking_smt_lotstudent_types));
+    	dac.addNewBindVariable("One", "1", false);
+    	
+    	dac.executeSelect();
 	}
 	
 	public class ParkingLotStudentOverlay extends Overlay
@@ -114,4 +130,33 @@ public class ViewParkingMapActivity extends MapActivity {
     		canvas.drawPath(mPath, mPaint);
 		}
 	}
+	
+	private class StudentLotCoordinatesJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			    	
+			String coordinatePair;
+			String[] coordinates;
+			
+	    	try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+	    				for(int index = 0; index < jArray.length(); index++)
+				    	{
+				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		coordinatePair = json_data.getString("coordinates");
+				    		coordinates = coordinatePair.split(",");
+				    	}
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	    			
 }

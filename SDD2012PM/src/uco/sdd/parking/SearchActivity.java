@@ -36,6 +36,9 @@ public class SearchActivity extends Activity {
 	    parkingLots = new ArrayList<String>();
 	    parkingTypes = new ArrayList<String>();
 	    
+	    Spinner spinnerParkingTypes = (Spinner)findViewById(R.id.search_spn_parkingtype);
+	    spinnerParkingTypes.setEnabled(false);
+	    
 	    Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
 	    spinnerParkingLots.setEnabled(false);
 	    
@@ -63,7 +66,7 @@ public class SearchActivity extends Activity {
 	}
 	
 	public void selectParkingTypes(String building)
-	{
+	{	    
 		HTTPDataAccess dac = new HTTPDataAccess(this,
     			getString(R.string.url_select), new SearchParkingTypeJSONListener());
 	    
@@ -95,12 +98,22 @@ public class SearchActivity extends Activity {
 	{
 		parkingLots.clear();
 		
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+		ArrayAdapter<String> adapterLots = new ArrayAdapter<String>(getApplicationContext(),
     			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
     	
     	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
-    	spinnerParkingLots.setAdapter(adapter);
+    	spinnerParkingLots.setAdapter(adapterLots);
     	spinnerParkingLots.setEnabled(false);
+    	
+    	parkingTypes.clear();
+    	
+    	ArrayAdapter<String> adapterTypes = new ArrayAdapter<String>(getApplicationContext(),
+    			R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingTypes);
+    	
+    	Spinner spinnerParkingTypes = (Spinner)findViewById(R.id.search_spn_parkingtype);
+    	spinnerParkingTypes.setAdapter(adapterTypes);
+    	spinnerParkingTypes.setOnItemSelectedListener(new OnParkingTypeItemSelectedListener());
+    	spinnerParkingTypes.setEnabled(false);
 	}
 	
 	private class SearchBuildingJSONListener implements GetJSONListener
@@ -248,6 +261,7 @@ public class SearchActivity extends Activity {
 	    	if (buildingValue.trim() != "")
 	    	{
 	    		building = buildingValue;
+	    		clearParkingLots();
 	    		selectParkingTypes(buildingValue);
 	    	}
 	    	else
