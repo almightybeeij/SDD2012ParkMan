@@ -224,7 +224,7 @@ public class SearchActivity extends Activity {
 	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		i.putExtra("Space" + (index + 1), json_data.getString("spaceId"));
+				    		i.putExtra("Space" + (index + 1), "Space " + json_data.getString("spaceId"));
 				    	}
 				    	
 	    				startActivity(i);
