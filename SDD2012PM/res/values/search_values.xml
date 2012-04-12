@@ -26,7 +26,7 @@
     </string>
     <string name="search_smt_parkinglots_types">sii</string>
     <string name="search_smt_parking">
-        select * from parkingspace where parkinglot_lotid = ? and available = ?
+        select * from parkingspace where parkinglot_lotid = ? and available = ? limit 0,5
     </string>
     <string name="search_smt_parking_types">ii</string>
 </resources>
