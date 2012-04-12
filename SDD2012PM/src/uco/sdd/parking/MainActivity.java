@@ -20,11 +20,14 @@ public class MainActivity extends ListActivity
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));
         
         Bundle extras = getIntent().getExtras();
-        String fName = extras.getString("firstName");
-        String lName = extras.getString("lastName");
+        if (extras != null)
+        {
+        	String fName = extras.getString("firstName");
+        	String lName = extras.getString("lastName");
         
-        TextView tv_Welcome = (TextView)findViewById(R.id.main_tvw_welcome);
-        tv_Welcome.setText("Welcome Back " + fName + " " + lName + "!");
+        	TextView tv_Welcome = (TextView)findViewById(R.id.main_tvw_welcome);
+        	tv_Welcome.setText("Welcome Back " + fName + " " + lName + "!");
+        }
     }
     
     @Override

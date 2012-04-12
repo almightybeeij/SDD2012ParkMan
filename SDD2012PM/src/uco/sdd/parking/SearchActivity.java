@@ -9,13 +9,13 @@ import org.json.JSONObject;
 import uco.sdd.utility.*;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 public class SearchActivity extends Activity {
 
@@ -186,7 +186,7 @@ public class SearchActivity extends Activity {
 	    		{
 	    			if (jArray.length() > 0)
 	    			{
-				    	for(int index = 0; index < jArray.length(); index++)
+	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
 				    		parkingLots.add("Parking Lot " + json_data.getString("lotid"));
@@ -218,15 +218,17 @@ public class SearchActivity extends Activity {
 	    		{
 	    			if (jArray.length() > 0)
 	    			{
-	    				String parkingAvailable = null;
+	    				Intent i = new Intent(getApplicationContext(), SearchResultsActivity.class);
+	    				i.putExtra("LotId", parkingLot);
 	    				
-				    	for(int index = 0; index < jArray.length(); index++)
+	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		parkingAvailable = parkingAvailable + json_data.getString("spaceId")+ " ";
+				    		i.putExtra("Space" + (index + 1), json_data.getString("spaceId"));
 				    	}
-				    	TextView tvTest = (TextView)findViewById(R.id.search_txt_error);
-				    	tvTest.setText(parkingAvailable);
+				    	
+	    				startActivity(i);
+	    				i = null;
 	    			}
 	    		}
 	    	}
