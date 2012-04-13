@@ -1,5 +1,6 @@
 package uco.sdd.parking;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -28,6 +29,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	private MapView mapView;
 	private MapController mc;
 	private List<Overlay> mapOverlays;
+	private List<ParkingLot> parkingLots;
 	private Projection projection;
 	
 	@Override
@@ -41,6 +43,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.viewmap_layout);
+	    
+	    parkingLots = new ArrayList<ParkingLot>();
 	    
 	    mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
@@ -78,11 +82,6 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		private Paint mPaint;
 		private Path mPath;
-		
-		private GeoPoint gP1;
-    	private GeoPoint gP2;
-    	private GeoPoint gP3;
-    	private GeoPoint gP4;
     	
 		private void init()
 		{
@@ -94,11 +93,6 @@ public class ViewParkingMapActivity extends MapActivity {
             mPaint.setStrokeCap(Paint.Cap.ROUND);
             mPaint.setStrokeWidth(2);
             mPaint.setAlpha(200);
-            
-            gP1 = new GeoPoint((int)(35.654023 * 1E6),(int)(-97.473898 * 1E6));
-            gP2 = new GeoPoint((int)(35.654071 * 1E6),(int)(-97.473902 * 1E6));
-            gP3 = new GeoPoint((int)(35.654071 * 1E6),(int)(-97.473931 * 1E6));
-            gP4 = new GeoPoint((int)(35.654023 * 1E6),(int)(-97.473926 * 1E6));
 		}
 		
 		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
@@ -110,23 +104,28 @@ public class ViewParkingMapActivity extends MapActivity {
     			this.isInitialized = true;
     		}
     		
-    		Point p1 = new Point();
-            Point p2 = new Point();
-            Point p3 = new Point();
-            Point p4 = new Point();
-            
-            mPath = new Path();
-            
-    		projection.toPixels(gP1, p1);
-            projection.toPixels(gP2, p2);
-            projection.toPixels(gP3, p3);
-            projection.toPixels(gP4, p4);
-
-            mPath.moveTo(p1.x, p1.y);
-            mPath.lineTo(p2.x,p2.y);
-            mPath.lineTo(p3.x, p3.y);
-            mPath.lineTo(p4.x, p4.y);
-            
+    		int count;
+    		mPath = new Path();
+    		Point coordPoint;
+    		
+    		for (ParkingLot lot : parkingLots)
+    		{
+    			count = 0;
+    			
+    			for (GeoPoint coordinate : lot.getCoordinates())
+    			{
+    				count++;
+    				
+    				coordPoint = new Point();
+    				projection.toPixels(coordinate, coordPoint);
+    				
+    				if (count == 1)
+    					mPath.moveTo(coordPoint.x, coordPoint.y);
+    				else
+    					mPath.lineTo(coordPoint.x, coordPoint.y);
+    			}
+    		}
+    		
     		canvas.drawPath(mPath, mPaint);
 		}
 	}
@@ -137,6 +136,7 @@ public class ViewParkingMapActivity extends MapActivity {
 			    	
 			String coordinatePair;
 			String[] coordinates;
+			ParkingLot lot;
 			
 	    	try
 	    	{
@@ -144,12 +144,17 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		{
 	    			if (jArray.length() > 0)
 	    			{
+	    				lot = new ParkingLot();
+	    				
 	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
 				    		coordinatePair = json_data.getString("coordinates");
 				    		coordinates = coordinatePair.split(",");
+				    		lot.addCoordinate(coordinates[0], coordinates[1]);
 				    	}
+	    				
+	    				parkingLots.add(lot);
 	    			}
 	    		}
 	    	}
