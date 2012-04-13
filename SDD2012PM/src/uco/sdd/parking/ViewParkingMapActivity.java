@@ -17,13 +17,19 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 
+import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ViewParkingMapActivity extends MapActivity {
@@ -59,7 +65,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    mapOverlays = mapView.getOverlays();  
 	    mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
-	    mapOverlays.add(new ParkingSpaceStudentOverlay());
+	    //mapOverlays.add(new ParkingSpaceStudentOverlay());
 	    
         String coordinates[] = {"35.654108", "-97.473863"};
         double lat = Double.parseDouble(coordinates[0]);
@@ -110,14 +116,28 @@ public class ViewParkingMapActivity extends MapActivity {
     	dac.executeSelect();
 	}
 	
+	public void showParkingLotDialog(ParkingLot lot)
+	{
+		LayoutInflater inflater = getLayoutInflater();
+		
+		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
+		
+		TextView tv = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_test);
+		tv.setText("Type: " + lot.getParkingType());
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Parking Lot " + Integer.toString(lot.getLotId()));
+		builder.setView(dialoglayout);
+		builder.show();
+	}
+	
 	public class ParkingLotStudentOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
 		
 		private Paint fillPaint;
 		private Paint strokePaint;
-		private Path lotPath;
-    	
+		
 		private void init()
 		{
 			strokePaint = new Paint();
@@ -151,8 +171,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			this.isInitialized = true;
 	    		}
 	    		
-	    		lotPath = new Path();
-	    		
 	    		Point coordInitial = new Point();
 	    		Point coordPoint = new Point();
 	    		
@@ -160,6 +178,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		{
 	    			int count = 0;
 	    			
+	    			Path lotPath = lot.getLotPath();
 	    			GeoPoint initial = lot.getCoordinates().get(0);
 	    			projection.toPixels(initial, coordInitial);
 	    			lotPath.moveTo(coordInitial.x, coordInitial.y);
@@ -186,6 +205,31 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 			}
 		}
+		
+		@Override
+        public boolean onTouchEvent(MotionEvent event, MapView mapView) 
+        {   
+            if (event.getAction() == 1)
+            {      
+            	for (ParkingLot lot : studentParkingLots)
+            	{
+            		Path lotPath = lot.getLotPath();
+            		
+	            	if (lotPath != null)
+	            	{
+	            		RectF lotRect = new RectF();
+	            		lotPath.computeBounds(lotRect, false);
+	                    
+	            		if (lotRect.contains(event.getX(), event.getY()))
+	            		{
+	            			showParkingLotDialog(lot);
+	            			break;
+	            		}                    
+	            	}
+            	}
+            }                            
+            return false;
+        }
 	}
 	
 	public class ParkingSpaceStudentOverlay extends Overlay
@@ -273,8 +317,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		private Paint fillPaint;
 		private Paint strokePaint;
-		private Path lotPath;
-    	
+		
 		private void init()
 		{
 			strokePaint = new Paint();
@@ -308,8 +351,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			this.isInitialized = true;
 	    		}
 	    		
-	    		lotPath = new Path();
-	    		
 	    		Point coordInitial = new Point();
 	    		Point coordPoint = new Point();
 	    		
@@ -317,6 +358,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		{
 	    			int count = 0;
 	    			
+	    			Path lotPath = lot.getLotPath();
 	    			GeoPoint initial = lot.getCoordinates().get(0);
 	    			projection.toPixels(initial, coordInitial);
 	    			lotPath.moveTo(coordInitial.x, coordInitial.y);
@@ -338,7 +380,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			
 	    			canvas.drawPath(lotPath, strokePaint);            
 	                canvas.drawPath(lotPath, fillPaint);
-	                canvas.drawText(Integer.toString(lot.getLotId()), coordPoint.x + 10, coordPoint.y - 15, strokePaint);
+	                canvas.drawText(Integer.toString(lot.getLotId()), coordPoint.x + 10, coordPoint.y - 15, strokePaint); 
 	    		}
 			}
 		}
@@ -346,12 +388,24 @@ public class ViewParkingMapActivity extends MapActivity {
 		@Override
         public boolean onTouchEvent(MotionEvent event, MapView mapView) 
         {   
-            if (event.getAction() == 1)
-            {                
-                GeoPoint p = projection.fromPixels((int) event.getX(), (int) event.getY());
-                
-                Toast.makeText(getBaseContext(), p.getLatitudeE6() / 1E6 + "," + 
-                        p.getLongitudeE6() /1E6, Toast.LENGTH_SHORT).show();
+			if (event.getAction() == 1)
+            {      
+            	for (ParkingLot lot : facultyParkingLots)
+            	{
+            		Path lotPath = lot.getLotPath();
+            		
+	            	if (lotPath != null)
+	            	{
+	            		RectF lotRect = new RectF();
+	            		lotPath.computeBounds(lotRect, false);
+	                    
+	            		if (lotRect.contains(event.getX(), event.getY()))
+	            		{
+	            			showParkingLotDialog(lot);
+	            			break;
+	            		}                    
+	            	}
+            	}
             }                            
             return false;
         }   
@@ -382,6 +436,11 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		coordinatePair = json_data.getString("coordinates");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.addCoordinate(coordinates[1], coordinates[0]);
+				    		lot.addBoundary(json_data.getString("boundary1"));
+				    		lot.addBoundary(json_data.getString("boundary2"));
+				    		lot.addBoundary(json_data.getString("boundary3"));
+				    		lot.addBoundary(json_data.getString("boundary4"));
+				    		lot.setParkingType("Student");
 				    	}
 	    				
 	    				lot.setLotId(lotId);
@@ -426,6 +485,11 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		coordinatePair = json_data.getString("coordinates");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.addCoordinate(coordinates[1], coordinates[0]);
+				    		lot.addBoundary(json_data.getString("boundary1"));
+				    		lot.addBoundary(json_data.getString("boundary2"));
+				    		lot.addBoundary(json_data.getString("boundary3"));
+				    		lot.addBoundary(json_data.getString("boundary4"));
+				    		lot.setParkingType("Faculty");
 				    	}
 	    				
 	    				lot.setLotId(lotId);

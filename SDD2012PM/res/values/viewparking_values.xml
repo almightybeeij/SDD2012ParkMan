@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="viewparking_smt_lotcoord">
-        select lotid, coordinates FROM coordinates, parkinglot 
+        select lotid, coordinates, boundary1, boundary2, boundary3, boundary4 FROM coordinates, parkinglot 
         where coordinates.parkinglot_lotid = parkinglot.lotid and studentlot = ? and facultylot = ?
         order by parkinglot_lotid, draworder
     </string>
@@ -10,4 +10,5 @@
         select * from parkingspace where parkinglot_lotid = ?
     </string>
     <string name="viewparking_smt_spacecoord_types">i</string>
+    <string name="viewparking_dlg_test">Test</string>
 </resources>

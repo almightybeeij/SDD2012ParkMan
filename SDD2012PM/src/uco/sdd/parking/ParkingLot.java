@@ -2,6 +2,8 @@ package uco.sdd.parking;
 
 import java.util.ArrayList;
 
+import android.graphics.Path;
+
 import com.google.android.maps.GeoPoint;
 
 public class ParkingLot {
@@ -9,16 +11,19 @@ public class ParkingLot {
 	private int lotId;
 	private boolean isStudent;
 	private boolean isFaculty;
+	private String parkingType;
 	
 	private ArrayList<GeoPoint> coordinates;
-	private ArrayList<GeoPoint> boundary;
+	private ArrayList<GeoPoint> boundaries;
 	private ArrayList<ParkingSpace> parkingSpaces;
+	private Path lotPath;
 	
 	public ParkingLot()
 	{
 		coordinates = new ArrayList<GeoPoint>();
-		boundary = new ArrayList<GeoPoint>();
+		boundaries = new ArrayList<GeoPoint>();
 		parkingSpaces = new ArrayList<ParkingSpace>();
+		lotPath = new Path();
 		
 		lotId = 0;
 		isStudent = false;
@@ -49,6 +54,14 @@ public class ParkingLot {
 		this.isFaculty = isFaculty;
 	}
 
+	public String getParkingType() {
+		return parkingType;
+	}
+
+	public void setParkingType(String parkingType) {
+		this.parkingType = parkingType;
+	}
+
 	public ArrayList<GeoPoint> getCoordinates() {
 		return coordinates;
 	}
@@ -57,12 +70,12 @@ public class ParkingLot {
 		this.coordinates = coordinates;
 	}
 
-	public ArrayList<GeoPoint> getBoundary() {
-		return boundary;
+	public ArrayList<GeoPoint> getBoundaries() {
+		return boundaries;
 	}
 
-	public void setBoundary(ArrayList<GeoPoint> boundary) {
-		this.boundary = boundary;
+	public void setBoundaries(ArrayList<GeoPoint> boundary) {
+		this.boundaries = boundary;
 	}
 	
 	public ArrayList<ParkingSpace> getParkingSpaces() {
@@ -71,6 +84,14 @@ public class ParkingLot {
 
 	public void setParkingSpaces(ArrayList<ParkingSpace> parkingSpaces) {
 		this.parkingSpaces = parkingSpaces;
+	}
+
+	public Path getLotPath() {
+		return lotPath;
+	}
+
+	public void setLotPath(Path lotPath) {
+		this.lotPath = lotPath;
 	}
 
 	public void addCoordinate(String latitude, String longitude)
@@ -94,7 +115,7 @@ public class ParkingLot {
             (int) (lat * 1E6), 
             (int) (lng * 1E6));
         
-        boundary.add(p);
+        boundaries.add(p);
 	}
 
 	@Override
@@ -127,4 +148,18 @@ public class ParkingLot {
 		return true;
 	}
 	
+	public void addBoundary(String coordinates)
+	{
+		String[] coordinate;
+		coordinate = coordinates.split(",");
+		
+		double lat = Double.parseDouble(coordinate[1]);
+        double lng = Double.parseDouble(coordinate[0]);
+ 
+        GeoPoint p = new GeoPoint(
+            (int) (lat * 1E6), 
+            (int) (lng * 1E6));
+        
+        boundaries.add(p);
+	}
 }
