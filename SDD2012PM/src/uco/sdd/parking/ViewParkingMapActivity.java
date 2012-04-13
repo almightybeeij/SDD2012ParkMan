@@ -244,12 +244,12 @@ public class ViewParkingMapActivity extends MapActivity {
 		{
 			strokePaint = new Paint();
 			strokePaint.setAntiAlias(false);
-            strokePaint.setColor(getResources().getColor(R.color.crimson));
+            strokePaint.setColor(getResources().getColor(R.color.black));
             strokePaint.setStyle(Paint.Style.STROKE);
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
             strokePaint.setStrokeWidth(1);
-            strokePaint.setAlpha(100);
+            strokePaint.setAlpha(40);
             
             fillPaint = new Paint();
 			fillPaint.setAntiAlias(false);
