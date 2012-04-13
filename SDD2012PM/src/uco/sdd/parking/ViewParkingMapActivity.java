@@ -104,25 +104,28 @@ public class ViewParkingMapActivity extends MapActivity {
     			this.isInitialized = true;
     		}
     		
-    		int count;
     		mPath = new Path();
-    		Point coordPoint;
+    		Point coordPoint = new Point();
     		
     		for (ParkingLot lot : parkingLots)
     		{
-    			count = 0;
+    			int count = 0;
+    			
+    			GeoPoint initial = lot.getCoordinates().get(0);
+    			projection.toPixels(initial, coordPoint);
+    			mPath.moveTo(coordPoint.x, coordPoint.y);
     			
     			for (GeoPoint coordinate : lot.getCoordinates())
     			{
     				count++;
     				
-    				coordPoint = new Point();
     				projection.toPixels(coordinate, coordPoint);
     				
-    				if (count == 1)
-    					mPath.moveTo(coordPoint.x, coordPoint.y);
-    				else
+    				if (count > 1)
+    				{
     					mPath.lineTo(coordPoint.x, coordPoint.y);
+    					mPath.moveTo(coordPoint.x, coordPoint.y);
+    				}
     			}
     		}
     		
