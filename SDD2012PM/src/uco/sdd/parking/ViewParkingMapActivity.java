@@ -23,6 +23,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 public class ViewParkingMapActivity extends MapActivity {
 
@@ -57,6 +59,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    mapOverlays = mapView.getOverlays();  
 	    mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
+	    mapOverlays.add(new ParkingSpaceStudentOverlay());
 	    
         String coordinates[] = {"35.654108", "-97.473863"};
         double lat = Double.parseDouble(coordinates[0]);
@@ -89,6 +92,20 @@ public class ViewParkingMapActivity extends MapActivity {
 	    dac.setTypes(getString(R.string.viewparking_smt_lotcoord_types));
     	dac.addNewBindVariable("studentLot", Integer.toString(isStudent), false);
     	dac.addNewBindVariable("facultyLot", Integer.toString(isFaculty), false);
+    	dac.setUseProgress(false);
+    	
+    	dac.executeSelect();
+	}
+	
+	public void selectParkingSpaces(int lotId, GetJSONListener listener)
+	{
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), listener);
+	    
+	    dac.setStatement(getString(R.string.viewparking_smt_spacecoord));
+	    dac.setTypes(getString(R.string.viewparking_smt_spacecoord_types));
+    	dac.addNewBindVariable("lotId", Integer.toString(lotId), false);
+    	dac.setUseProgress(false);
     	
     	dac.executeSelect();
 	}
@@ -164,6 +181,87 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			
 	    			canvas.drawPath(lotPath, strokePaint);            
 	                canvas.drawPath(lotPath, fillPaint);
+	                canvas.drawText(Integer.toString(lot.getLotId()),
+	                		coordPoint.x + 10, coordPoint.y + 20, strokePaint);
+	    		}
+			}
+		}
+	}
+	
+	public class ParkingSpaceStudentOverlay extends Overlay
+	{
+		private boolean isInitialized = false;
+		
+		private Paint fillPaint;
+		private Paint strokePaint;
+    	private Path spacePath;
+    	
+		private void init()
+		{
+			strokePaint = new Paint();
+			strokePaint.setAntiAlias(true);
+            strokePaint.setColor(getResources().getColor(R.color.crimson));
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeWidth(2);
+            strokePaint.setAlpha(100);
+            
+            fillPaint = new Paint();
+			fillPaint.setAntiAlias(true);
+            fillPaint.setColor(Color.RED);
+            fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            fillPaint.setStrokeJoin(Paint.Join.ROUND);
+            fillPaint.setStrokeCap(Paint.Cap.ROUND);
+            fillPaint.setStrokeWidth(1);
+            fillPaint.setAlpha(60);
+		}
+		
+		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
+    		
+			super.draw(canvas, mapv, shadow);
+    		
+			if (shadow == false)
+			{
+	    		if (!isInitialized)
+	    		{
+	    			this.init();
+	    			this.isInitialized = true;
+	    		}
+	    		
+	    		spacePath = new Path();
+	    		
+	    		Point coordInitial = new Point();
+	    		Point coordPoint = new Point();
+	    		
+	    		for (ParkingLot lot : studentParkingLots)
+	    		{
+	    			for (ParkingSpace space : lot.getParkingSpaces())
+	                {
+	                	int count = 0;
+	                	
+	                	GeoPoint initial = space.getCorners().get(0);
+		    			projection.toPixels(initial, coordInitial);
+		    			spacePath.moveTo(coordInitial.x, coordInitial.y);
+		    			
+		    			for (GeoPoint corner : space.getCorners())
+		    			{
+		    				count++;
+		    				
+		    				projection.toPixels(corner, coordPoint);
+		    				
+		    				if (count > 1)
+		    				{
+		    					spacePath.lineTo(coordPoint.x, coordPoint.y);
+		    				}
+		    			}
+		    			
+		    			spacePath.lineTo(coordInitial.x, coordInitial.y);
+		    			spacePath.close();
+		    			
+		    			canvas.drawPath(spacePath, strokePaint);            
+		                canvas.drawPath(spacePath, fillPaint);
+	                }
 	    		}
 			}
 		}
@@ -240,15 +338,30 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			
 	    			canvas.drawPath(lotPath, strokePaint);            
 	                canvas.drawPath(lotPath, fillPaint);
+	                canvas.drawText(Integer.toString(lot.getLotId()), coordPoint.x + 10, coordPoint.y - 15, strokePaint);
 	    		}
 			}
 		}
+		
+		@Override
+        public boolean onTouchEvent(MotionEvent event, MapView mapView) 
+        {   
+            if (event.getAction() == 1)
+            {                
+                GeoPoint p = projection.fromPixels((int) event.getX(), (int) event.getY());
+                
+                Toast.makeText(getBaseContext(), p.getLatitudeE6() / 1E6 + "," + 
+                        p.getLongitudeE6() /1E6, Toast.LENGTH_SHORT).show();
+            }                            
+            return false;
+        }   
 	}
 	
 	private class StudentLotCoordinatesJSONListener implements GetJSONListener
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    	
+			int lotId = 0;
 			String coordinatePair;
 			String[] coordinates;
 			ParkingLot lot;
@@ -264,12 +377,21 @@ public class ViewParkingMapActivity extends MapActivity {
 	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		
+				    		if (index == 0) lotId = json_data.getInt("lotid");
 				    		coordinatePair = json_data.getString("coordinates");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.addCoordinate(coordinates[1], coordinates[0]);
 				    	}
 	    				
+	    				lot.setLotId(lotId);
 	    				studentParkingLots.add(lot);
+	    				mapView.postInvalidate();
+	    				
+	    				for (ParkingLot studentLot : studentParkingLots)
+	    				{
+	    					selectParkingSpaces(studentLot.getLotId(), new StudentSpacesJSONListener());
+	    				}
 	    			}
 	    		}
 	    	}
@@ -283,6 +405,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    	
+			int lotId = 0;
 			String coordinatePair;
 			String[] coordinates;
 			ParkingLot lot;
@@ -298,12 +421,16 @@ public class ViewParkingMapActivity extends MapActivity {
 	    				for(int index = 0; index < jArray.length(); index++)
 				    	{
 				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		
+				    		if (index == 0) lotId = json_data.getInt("lotid");
 				    		coordinatePair = json_data.getString("coordinates");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.addCoordinate(coordinates[1], coordinates[0]);
 				    	}
 	    				
+	    				lot.setLotId(lotId);
 	    				facultyParkingLots.add(lot);
+	    				mapView.postInvalidate();
 	    			}
 	    		}
 	    	}
@@ -311,5 +438,101 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+	}
+	
+	private class StudentSpacesJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			    
+			ParkingLot lotLookFor;
+			ParkingLot lotMatch;
+			ParkingSpace space;
+			JSONObject json_data;
+			
+			try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+	    				lotLookFor = new ParkingLot();
+	    				lotMatch = new ParkingLot();
+	    				
+	    				json_data = jArray.getJSONObject(0);
+	    				
+	    				int lotId = json_data.getInt("ParkingLot_lotId");
+			    		lotLookFor.setLotId(lotId);
+			    		
+			    		int match = studentParkingLots.indexOf(lotLookFor);
+			    		
+			    		if (match != -1)
+			    		{
+			    			lotMatch = studentParkingLots.get(match);
+			    			
+			    			for(int index = 0; index < jArray.length(); index++)
+					    	{
+					    		json_data = jArray.getJSONObject(index);
+					    		
+					    		space = new ParkingSpace();
+					    		space.setSpaceId(json_data.getInt("spaceId"));
+					    		space.setClientEmail(json_data.getString("Client_email"));
+					    		space.addCorner(json_data.getString("corner1"));
+					    		space.addCorner(json_data.getString("corner2"));
+					    		space.addCorner(json_data.getString("corner3"));
+					    		space.addCorner(json_data.getString("corner4"));
+					    		space.setAvailable(BooleanFromString(json_data.getString("available")));
+					    		space.setHandicap(BooleanFromString(json_data.getString("handicap")));
+					    		
+					    		lotMatch.getParkingSpaces().add(space);
+					    	}
+			    		}
+	    				
+	    				mapView.postInvalidate();
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
+	private class FacultySpacesJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			    
+			ParkingSpace space;
+			
+			try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+	    				space = new ParkingSpace();
+	    				
+	    				for(int index = 0; index < jArray.length(); index++)
+				    	{
+				    		JSONObject json_data = jArray.getJSONObject(index);
+				    		
+				    		
+				    	}
+	    				
+	    				mapView.postInvalidate();
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
+	private boolean BooleanFromString(String value)
+	{
+		if (value == "1")
+			return true;
+		else
+			return false;
 	}
 }

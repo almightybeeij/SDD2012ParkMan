@@ -62,4 +62,19 @@ public class ParkingSpace {
 	public void setCorners(ArrayList<GeoPoint> corners) {
 		this.corners = corners;
 	}
+	
+	public void addCorner(String coordinates)
+	{
+		String[] coordinate;
+		coordinate = coordinates.split(",");
+		
+		double lat = Double.parseDouble(coordinate[1]);
+        double lng = Double.parseDouble(coordinate[0]);
+ 
+        GeoPoint p = new GeoPoint(
+            (int) (lat * 1E6), 
+            (int) (lng * 1E6));
+        
+        corners.add(p);
+	}
 }

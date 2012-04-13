@@ -12,11 +12,13 @@ public class ParkingLot {
 	
 	private ArrayList<GeoPoint> coordinates;
 	private ArrayList<GeoPoint> boundary;
+	private ArrayList<ParkingSpace> parkingSpaces;
 	
 	public ParkingLot()
 	{
 		coordinates = new ArrayList<GeoPoint>();
 		boundary = new ArrayList<GeoPoint>();
+		parkingSpaces = new ArrayList<ParkingSpace>();
 		
 		lotId = 0;
 		isStudent = false;
@@ -63,6 +65,14 @@ public class ParkingLot {
 		this.boundary = boundary;
 	}
 	
+	public ArrayList<ParkingSpace> getParkingSpaces() {
+		return parkingSpaces;
+	}
+
+	public void setParkingSpaces(ArrayList<ParkingSpace> parkingSpaces) {
+		this.parkingSpaces = parkingSpaces;
+	}
+
 	public void addCoordinate(String latitude, String longitude)
 	{
 		double lat = Double.parseDouble(latitude);
@@ -86,4 +96,35 @@ public class ParkingLot {
         
         boundary.add(p);
 	}
+
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + lotId;
+		
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		ParkingLot other = (ParkingLot) obj;
+		
+		if (lotId != other.lotId)
+			return false;
+		
+		return true;
+	}
+	
 }

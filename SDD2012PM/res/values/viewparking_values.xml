@@ -6,4 +6,8 @@
         order by parkinglot_lotid, draworder
     </string>
     <string name="viewparking_smt_lotcoord_types">ii</string>
+    <string name="viewparking_smt_spacecoord">
+        select * from parkingspace where parkinglot_lotid = ?
+    </string>
+    <string name="viewparking_smt_spacecoord_types">i</string>
 </resources>

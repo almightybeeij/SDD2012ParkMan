@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 
 public class HTTPDataAccess {
 	
+	private boolean useProgress;
 	private String url;
 	private String statement;
 	private String types;
@@ -38,11 +39,20 @@ public class HTTPDataAccess {
 	public HTTPDataAccess(Context context, String url, GetJSONListener listener) {
 		
 		this.url = url;
+		this.useProgress = true;
 		this.getJSONListener = listener;
 		this.bindVariables = new ArrayList<NameValuePair>();
 		this.currentContext = context;
 	}
 	
+	public boolean isUseProgress() {
+		return useProgress;
+	}
+
+	public void setUseProgress(boolean useProgress) {
+		this.useProgress = useProgress;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -145,17 +155,21 @@ public class HTTPDataAccess {
 		@Override
 	    public void onPreExecute()
 		{
-	        progressDialog = new ProgressDialog(currentContext);
-	        progressDialog.setMessage("Loading..Please wait..");
-	        progressDialog.setCancelable(false);
-	        progressDialog.setIndeterminate(true);
-	        progressDialog.show();
+			if (useProgress)
+			{
+		        progressDialog = new ProgressDialog(currentContext);
+		        progressDialog.setMessage("Loading..Please wait..");
+		        progressDialog.setCancelable(false);
+		        progressDialog.setIndeterminate(true);
+		        progressDialog.show();
+			}
 	    }
 		
 		protected void onPostExecute(JSONArray jArray)
 		{
 			getJSONListener.onRemoteCallComplete(jArray);
-			progressDialog.dismiss();
+			if (useProgress)
+				progressDialog.dismiss();
 		}
 	}
 	
