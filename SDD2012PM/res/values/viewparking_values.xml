@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="viewparking_smt_lotstudent">
+    <string name="viewparking_smt_lotcoord">
         select lotid, coordinates FROM coordinates, parkinglot 
-        where coordinates.parkinglot_lotid = parkinglot.lotid and studentlot = ? 
+        where coordinates.parkinglot_lotid = parkinglot.lotid and studentlot = ? and facultylot = ?
         order by parkinglot_lotid, draworder
     </string>
-    <string name="viewparking_smt_lotstudent_types">i</string>
+    <string name="viewparking_smt_lotcoord_types">ii</string>
 </resources>
