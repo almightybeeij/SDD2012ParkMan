@@ -65,7 +65,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    mapOverlays = mapView.getOverlays();  
 	    mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
-	    //mapOverlays.add(new ParkingSpaceStudentOverlay());
+	    mapOverlays.add(new ParkingSpaceStudentOverlay());
 	    
         String coordinates[] = {"35.654108", "-97.473863"};
         double lat = Double.parseDouble(coordinates[0]);
@@ -243,16 +243,16 @@ public class ViewParkingMapActivity extends MapActivity {
 		private void init()
 		{
 			strokePaint = new Paint();
-			strokePaint.setAntiAlias(true);
+			strokePaint.setAntiAlias(false);
             strokePaint.setColor(getResources().getColor(R.color.crimson));
             strokePaint.setStyle(Paint.Style.STROKE);
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
-            strokePaint.setStrokeWidth(2);
+            strokePaint.setStrokeWidth(1);
             strokePaint.setAlpha(100);
             
             fillPaint = new Paint();
-			fillPaint.setAntiAlias(true);
+			fillPaint.setAntiAlias(false);
             fillPaint.setColor(Color.RED);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -304,7 +304,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		    			spacePath.close();
 		    			
 		    			canvas.drawPath(spacePath, strokePaint);            
-		                canvas.drawPath(spacePath, fillPaint);
+		                //canvas.drawPath(spacePath, fillPaint);
 	                }
 	    		}
 			}
