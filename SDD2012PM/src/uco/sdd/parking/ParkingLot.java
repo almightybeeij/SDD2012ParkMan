@@ -162,4 +162,9 @@ public class ParkingLot {
         
         boundaries.add(p);
 	}
+	
+	public void clearPath()
+	{
+		this.lotPath = new Path();
+	}
 }

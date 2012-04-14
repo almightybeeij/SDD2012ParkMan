@@ -65,7 +65,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    mapOverlays = mapView.getOverlays();  
 	    mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
-	    mapOverlays.add(new ParkingSpaceStudentOverlay());
+	    //mapOverlays.add(new ParkingSpaceStudentOverlay());
 	    
         String coordinates[] = {"35.654108", "-97.473863"};
         double lat = Double.parseDouble(coordinates[0]);
@@ -80,6 +80,23 @@ public class ViewParkingMapActivity extends MapActivity {
         
         selectParkingLotCoordinates(true, false);
         selectParkingLotCoordinates(false, true);
+	}
+	
+	public void mapButtonOnClick(View view)
+	{
+		switch(view.getId())
+		{
+			case R.id.viewparking_btn_sat:
+			{
+				mapView.setSatellite(true);
+				break;
+			}
+			case R.id.viewparking_btn_str:
+			{
+				mapView.setSatellite(false);
+				mapView.setStreetView(true);
+			}
+		}
 	}
 	
 	public void selectParkingLotCoordinates(boolean studentLot, boolean facultyLot)
@@ -178,6 +195,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		{
 	    			int count = 0;
 	    			
+	    			lot.clearPath();
 	    			Path lotPath = lot.getLotPath();
 	    			GeoPoint initial = lot.getCoordinates().get(0);
 	    			projection.toPixels(initial, coordInitial);
@@ -223,11 +241,13 @@ public class ViewParkingMapActivity extends MapActivity {
 	            		if (lotRect.contains(event.getX(), event.getY()))
 	            		{
 	            			showParkingLotDialog(lot);
+	            			
 	            			break;
 	            		}                    
 	            	}
             	}
-            }                            
+            } 
+            mapView.invalidate();
             return false;
         }
 	}
@@ -358,6 +378,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		{
 	    			int count = 0;
 	    			
+	    			lot.clearPath();
 	    			Path lotPath = lot.getLotPath();
 	    			GeoPoint initial = lot.getCoordinates().get(0);
 	    			projection.toPixels(initial, coordInitial);

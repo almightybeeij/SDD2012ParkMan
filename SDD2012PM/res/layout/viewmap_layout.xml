@@ -4,10 +4,31 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
     
+    <LinearLayout android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewmap_lyt_buttons" >"
+    
+    	<Button android:layout_weight="0.5"
+    	    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/viewparking_btn_satellite"
+		    android:id="@+id/viewparking_btn_sat"
+		    android:onClick="mapButtonOnClick" />
+    	
+    	<Button android:layout_weight="0.5"
+    	    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/viewparking_btn_street"
+		    android:id="@+id/viewparking_btn_str"
+		    android:onClick="mapButtonOnClick" />
+    
+    </LinearLayout>
+    
     <com.google.android.maps.MapView
     	android:id="@+id/mapview"
     	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
+    	android:layout_height="wrap_content"
     	android:clickable="true"
     	android:apiKey="0IBY-hBnxW66uHreOfJiYE6R18xozFIzAclKH2w" />
 

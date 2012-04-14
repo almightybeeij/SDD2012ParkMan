@@ -11,4 +11,6 @@
     </string>
     <string name="viewparking_smt_spacecoord_types">i</string>
     <string name="viewparking_dlg_test">Test</string>
+    <string name="viewparking_btn_satellite">Satellite View</string>
+    <string name="viewparking_btn_street">Street View</string>
 </resources>
