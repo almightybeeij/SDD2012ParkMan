@@ -146,6 +146,8 @@ public class SearchActivity extends Activity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	private class SearchParkingTypeJSONListener implements GetJSONListener
@@ -187,6 +189,8 @@ public class SearchActivity extends Activity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	private class SearchParkingLotJSONListener implements GetJSONListener
@@ -219,6 +223,8 @@ public class SearchActivity extends Activity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	private class SearchParkingJSONListener implements GetJSONListener
@@ -249,6 +255,8 @@ public class SearchActivity extends Activity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	public class OnBuildingItemSelectedListener implements OnItemSelectedListener {

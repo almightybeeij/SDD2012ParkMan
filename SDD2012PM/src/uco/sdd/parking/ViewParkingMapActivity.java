@@ -18,12 +18,18 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,6 +46,11 @@ public class ViewParkingMapActivity extends MapActivity {
 	private List<ParkingLot> studentParkingLots;
 	private List<ParkingLot> facultyParkingLots;
 	private Projection projection;
+	private TextView tvDialog;
+	
+	private LocationManager locationManager;
+	private String locationProvider;
+	private myLocationListener locationListener;
 	
 	@Override
 	protected boolean isRouteDisplayed() {
@@ -52,6 +63,14 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.viewmap_layout);
+	    
+	    Criteria criteria = new Criteria();
+	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
+	    
+	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+	    locationListener = new myLocationListener();
+	    locationProvider = locationManager.getBestProvider(criteria, true);
+	    locationManager.requestLocationUpdates(locationProvider, 1000, 0, locationListener);
 	    
 	    studentParkingLots = new ArrayList<ParkingLot>();
 	    facultyParkingLots = new ArrayList<ParkingLot>();
@@ -80,6 +99,14 @@ public class ViewParkingMapActivity extends MapActivity {
         
         selectParkingLotCoordinates(true, false);
         selectParkingLotCoordinates(false, true);
+        selectDirections("35.652937,-97.478342", "35.6589,-97.469459");
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		locationManager.removeUpdates(locationListener);
+		super.onDestroy();
 	}
 	
 	public void mapButtonOnClick(View view)
@@ -88,6 +115,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		{
 			case R.id.viewparking_btn_sat:
 			{
+				mapView.setStreetView(false);
 				mapView.setSatellite(true);
 				break;
 			}
@@ -97,6 +125,37 @@ public class ViewParkingMapActivity extends MapActivity {
 				mapView.setStreetView(true);
 			}
 		}
+	}
+	
+	public void getDirectionsOnClick(View view)
+	{
+		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+		
+		if (lastKnownLocation != null)
+		{
+			tvDialog.setText(Double.toString(lastKnownLocation.getLatitude()) +
+					", " + Double.toString(lastKnownLocation.getLongitude()));
+			
+			GeoPoint p = new GeoPoint((int) (lastKnownLocation.getLatitude() * 1E6),
+					(int) (lastKnownLocation.getLongitude() * 1E6));
+		 
+		    mc.animateTo(p);
+		}
+	}
+	
+	public void selectDirections(String origin, String destination)
+	{
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			"http://maps.googleapis.com/maps/api/directions/json?origin=35.652937,-97.478342&destination=35.6589,-97.469459&sensor=false"
+, new GetDirectionsJSONListener());
+	    
+		dac.setUsingStatement(false);
+	    
+    	//dac.addNewBindVariable("origin", origin, false);
+    	//dac.addNewBindVariable("destination", destination, false);
+    	//dac.addNewBindVariable("sensor", "false", false);
+    	
+    	dac.executeSelect();
 	}
 	
 	public void selectParkingLotCoordinates(boolean studentLot, boolean facultyLot)
@@ -115,7 +174,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    dac.setTypes(getString(R.string.viewparking_smt_lotcoord_types));
     	dac.addNewBindVariable("studentLot", Integer.toString(isStudent), false);
     	dac.addNewBindVariable("facultyLot", Integer.toString(isFaculty), false);
-    	dac.setUseProgress(false);
+    	dac.setUsingProgress(false);
     	
     	dac.executeSelect();
 	}
@@ -128,7 +187,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    dac.setStatement(getString(R.string.viewparking_smt_spacecoord));
 	    dac.setTypes(getString(R.string.viewparking_smt_spacecoord_types));
     	dac.addNewBindVariable("lotId", Integer.toString(lotId), false);
-    	dac.setUseProgress(false);
+    	dac.setUsingProgress(false);
     	
     	dac.executeSelect();
 	}
@@ -139,8 +198,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
 		
-		TextView tv = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_test);
-		tv.setText("Type: " + lot.getParkingType());
+		tvDialog = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_test);
+		tvDialog.setText("Type: " + lot.getParkingType());
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Parking Lot " + Integer.toString(lot.getLotId()));
@@ -479,6 +538,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	 
 	private class FacultyLotCoordinatesJSONListener implements GetJSONListener
@@ -523,6 +584,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	private class StudentSpacesJSONListener implements GetJSONListener
@@ -580,6 +643,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
 	private class FacultySpacesJSONListener implements GetJSONListener
@@ -611,8 +676,48 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
+	private class GetDirectionsJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {
+			
+			try
+	    	{
+	    		if (jObject != null)
+	    		{
+	    			if (jObject.length() > 0)
+	    			{
+			    		String status = jObject.getString("status");
+			    		String test = status;
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+	}
+	
+	public class myLocationListener implements LocationListener
+	{    
+		public void onLocationChanged(Location location)
+	    {
+	      // Called when a new location is found by the network location provider.
+	      //makeUseOfNewLocation(location);
+	    }
+
+	    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+	    public void onProviderEnabled(String provider) {}
+
+	    public void onProviderDisabled(String provider) {}
+	}
+	  
 	private boolean BooleanFromString(String value)
 	{
 		if (value == "1")

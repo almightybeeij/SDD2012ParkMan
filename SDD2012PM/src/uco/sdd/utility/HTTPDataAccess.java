@@ -19,6 +19,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -26,7 +27,8 @@ import android.os.AsyncTask;
 
 public class HTTPDataAccess {
 	
-	private boolean useProgress;
+	private boolean usingProgress;
+	private boolean usingStatement;
 	private String url;
 	private String statement;
 	private String types;
@@ -39,18 +41,27 @@ public class HTTPDataAccess {
 	public HTTPDataAccess(Context context, String url, GetJSONListener listener) {
 		
 		this.url = url;
-		this.useProgress = true;
+		this.usingProgress = true;
+		this.usingStatement = true;
 		this.getJSONListener = listener;
 		this.bindVariables = new ArrayList<NameValuePair>();
 		this.currentContext = context;
 	}
 	
-	public boolean isUseProgress() {
-		return useProgress;
+	public boolean isUsingProgress() {
+		return usingProgress;
 	}
 
-	public void setUseProgress(boolean useProgress) {
-		this.useProgress = useProgress;
+	public void setUsingProgress(boolean useProgress) {
+		this.usingProgress = useProgress;
+	}
+
+	public boolean isUsingStatement() {
+		return usingStatement;
+	}
+
+	public void setUsingStatement(boolean usingStatement) {
+		this.usingStatement = usingStatement;
 	}
 
 	public String getUrl() {
@@ -155,7 +166,7 @@ public class HTTPDataAccess {
 		@Override
 	    public void onPreExecute()
 		{
-			if (useProgress)
+			if (usingProgress)
 			{
 		        progressDialog = new ProgressDialog(currentContext);
 		        progressDialog.setMessage("Loading..Please wait..");
@@ -168,7 +179,69 @@ public class HTTPDataAccess {
 		protected void onPostExecute(JSONArray jArray)
 		{
 			getJSONListener.onRemoteCallComplete(jArray);
-			if (useProgress)
+			if (usingProgress)
+				progressDialog.dismiss();
+		}
+	}
+	
+	public class ExecuteSelectSingleTask extends AsyncTask<String, Void, JSONObject>
+	{
+		protected JSONObject doInBackground(String... urls)
+		{
+			return executeSelect(urls[0]);
+		}
+		
+		private JSONObject executeSelect(String url)
+		{
+			HttpClient httpclient = new DefaultHttpClient();
+    	    HttpPost httppost = new HttpPost(url);
+    	    JSONObject jObject = null;
+    	    
+			try
+			{
+    	    	ArrayList<NameValuePair> requestVariables = buildRequestVariables();
+    	    	httppost.setEntity(new UrlEncodedFormEntity(requestVariables));
+    	    	
+    	    	HttpResponse response = httpclient.execute(httppost);
+        	    HttpEntity entity = response.getEntity();
+        	    
+        	    if (entity != null)
+        	    {
+        	    	InputStream istream = entity.getContent();
+        	    	String result = convertStreamToString(istream);
+        	    	
+        	    	jObject = new JSONObject(result);
+        	    }				
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			return jObject;
+		}
+		
+		@Override
+	    public void onPreExecute()
+		{
+			if (usingProgress)
+			{
+		        progressDialog = new ProgressDialog(currentContext);
+		        progressDialog.setMessage("Loading..Please wait..");
+		        progressDialog.setCancelable(false);
+		        progressDialog.setIndeterminate(true);
+		        progressDialog.show();
+			}
+	    }
+		
+		protected void onPostExecute(JSONObject jObject)
+		{
+			getJSONListener.onRemoteCallComplete(jObject);
+			if (usingProgress)
 				progressDialog.dismiss();
 		}
 	}
@@ -213,11 +286,14 @@ public class HTTPDataAccess {
 		
 		try
 		{
-			mcrypt = new MCrypt();
-			encrypted = MCrypt.bytesToHex(mcrypt.encrypt(statement));
+			if (usingStatement)
+			{
+				mcrypt = new MCrypt();
+				encrypted = MCrypt.bytesToHex(mcrypt.encrypt(statement));
 			
-			requestVariables.add(new BasicNameValuePair("stmt", encrypted));
-			requestVariables.add(new BasicNameValuePair("types", types));
+				requestVariables.add(new BasicNameValuePair("stmt", encrypted));
+				requestVariables.add(new BasicNameValuePair("types", types));
+			}
 			
 			for (int index = 0; index < bindVariables.size(); index++)
 			{

@@ -10,5 +10,10 @@
 	    android:id="@+id/viewmap_dlg_test"
 	    android:paddingTop="10sp"
 	    android:text="@string/viewparking_dlg_test" />
+	
+	<Button android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/viewparking_btn_getdirections"
+	    android:onClick="getDirectionsOnClick" />
 		
 </LinearLayout>

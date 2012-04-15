@@ -86,6 +86,8 @@ public class LogInActivity extends Activity {
 	    		e.printStackTrace();
 	    	}
 	    }
+	    
+	    public void onRemoteCallComplete(JSONObject jObject) {}
     }
     
     @Override
