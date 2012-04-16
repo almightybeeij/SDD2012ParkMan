@@ -29,9 +29,12 @@ public class HTTPDataAccess {
 	
 	private boolean usingProgress;
 	private boolean usingStatement;
+	private boolean usingEncoding;
+	
 	private String url;
 	private String statement;
 	private String types;
+	private String encoding;
 	
 	private ArrayList<NameValuePair> bindVariables;
 	private GetJSONListener getJSONListener;
@@ -43,6 +46,7 @@ public class HTTPDataAccess {
 		this.url = url;
 		this.usingProgress = true;
 		this.usingStatement = true;
+		this.usingEncoding = false;
 		this.getJSONListener = listener;
 		this.bindVariables = new ArrayList<NameValuePair>();
 		this.currentContext = context;
@@ -62,6 +66,14 @@ public class HTTPDataAccess {
 
 	public void setUsingStatement(boolean usingStatement) {
 		this.usingStatement = usingStatement;
+	}
+
+	public boolean isUsingEncoding() {
+		return usingEncoding;
+	}
+
+	public void setUsingEncoding(boolean usingEncoding) {
+		this.usingEncoding = usingEncoding;
 	}
 
 	public String getUrl() {
@@ -86,6 +98,14 @@ public class HTTPDataAccess {
 
 	public void setTypes(String types) {
 		this.types = types;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 
 	public ArrayList<NameValuePair> getBindVariables() {
@@ -122,6 +142,11 @@ public class HTTPDataAccess {
 		new ExecuteSelectTask().execute(this.url);
 	}
 	
+	public void executeSelectSingle()
+	{
+		new ExecuteSelectSingleTask().execute(this.url);
+	}
+	
 	public class ExecuteSelectTask extends AsyncTask<String, Void, JSONArray>
 	{
 		protected JSONArray doInBackground(String... urls)
@@ -138,7 +163,9 @@ public class HTTPDataAccess {
 			try
 			{
     	    	ArrayList<NameValuePair> requestVariables = buildRequestVariables();
-    	    	httppost.setEntity(new UrlEncodedFormEntity(requestVariables));
+    	    	UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(requestVariables, "UTF-8");
+    	    	if (usingEncoding) formEntity.setContentEncoding(encoding);
+    	    	httppost.setEntity(formEntity);
     	    	
     	    	HttpResponse response = httpclient.execute(httppost);
         	    HttpEntity entity = response.getEntity();

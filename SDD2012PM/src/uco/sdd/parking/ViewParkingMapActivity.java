@@ -3,6 +3,7 @@ package uco.sdd.parking;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,14 +30,12 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ViewParkingMapActivity extends MapActivity {
 
@@ -95,6 +94,7 @@ public class ViewParkingMapActivity extends MapActivity {
             (int) (lng * 1E6));
  
         mc.animateTo(p);
+        
         mc.setZoom(19); 
         
         selectParkingLotCoordinates(true, false);
@@ -146,16 +146,15 @@ public class ViewParkingMapActivity extends MapActivity {
 	public void selectDirections(String origin, String destination)
 	{
 		HTTPDataAccess dac = new HTTPDataAccess(this,
-    			"http://maps.googleapis.com/maps/api/directions/json?origin=35.652937,-97.478342&destination=35.6589,-97.469459&sensor=false"
-, new GetDirectionsJSONListener());
+    			"https://maps.googleapis.com/maps/api/directions/json?" +
+    			"origin=" + origin + "&destination=" + destination + "&sensor=false",
+    			new GetDirectionsJSONListener());
 	    
 		dac.setUsingStatement(false);
-	    
-    	//dac.addNewBindVariable("origin", origin, false);
-    	//dac.addNewBindVariable("destination", destination, false);
-    	//dac.addNewBindVariable("sensor", "false", false);
+	    dac.setUsingEncoding(true);
+	    dac.setEncoding(HTTP.UTF_8);
     	
-    	dac.executeSelect();
+    	dac.executeSelectSingle();
 	}
 	
 	public void selectParkingLotCoordinates(boolean studentLot, boolean facultyLot)
@@ -491,6 +490,63 @@ public class ViewParkingMapActivity extends MapActivity {
         }   
 	}
 	
+	public class DirectionPathOverlay extends Overlay {
+	    
+		private boolean isInitialized = false;
+		
+		private GeoPoint gp1;
+	    private GeoPoint gp2;
+	    private Paint strokePaint;
+	    
+	    public DirectionPathOverlay(GeoPoint gp1, GeoPoint gp2)
+	    {
+	        this.gp1 = gp1;
+	        this.gp2 = gp2;
+	    }
+
+	    private void init()
+		{
+			strokePaint = new Paint();
+			strokePaint.setAntiAlias(true);
+            strokePaint.setColor(getResources().getColor(R.color.blue));
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeWidth(2);
+            strokePaint.setAlpha(180);
+		}
+	    
+	    @Override
+	    public boolean draw(Canvas canvas, MapView mapView, boolean shadow, long when) {
+	        
+	        if (shadow == false) {
+	        	
+	        	if (!isInitialized)
+	    		{
+	    			this.init();
+	    			this.isInitialized = true;
+	    		}
+	        	
+	            Point point = new Point();
+	            projection.toPixels(gp1, point);
+	            
+	            Point point2 = new Point();
+	            projection.toPixels(gp2, point2);
+	            
+	            canvas.drawLine((float) point.x, (float) point.y, (float) point2.x,
+	                    (float) point2.y, strokePaint);
+	        }
+	        
+	        return super.draw(canvas, mapView, shadow, when);
+	    }
+
+	    @Override
+	    public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+	        
+	        super.draw(canvas, mapView, shadow);
+	    }
+	}
+	
 	private class StudentLotCoordinatesJSONListener implements GetJSONListener
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {
@@ -647,39 +703,6 @@ public class ViewParkingMapActivity extends MapActivity {
 		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
-	private class FacultySpacesJSONListener implements GetJSONListener
-	{
-		public void onRemoteCallComplete(JSONArray jArray) {
-			    
-			ParkingSpace space;
-			
-			try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
-	    				space = new ParkingSpace();
-	    				
-	    				for(int index = 0; index < jArray.length(); index++)
-				    	{
-				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		
-				    		
-				    	}
-	    				
-	    				mapView.postInvalidate();
-	    			}
-	    		}
-	    	}
-	    	catch (JSONException e)	{
-	    		e.printStackTrace();
-	    	}
-		}
-		
-		public void onRemoteCallComplete(JSONObject jObject) {}
-	}
-	
 	private class GetDirectionsJSONListener implements GetJSONListener
 	{
 		public void onRemoteCallComplete(JSONArray jArray) {}
@@ -693,7 +716,10 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			if (jObject.length() > 0)
 	    			{
 			    		String status = jObject.getString("status");
-			    		String test = status;
+			    		if (status != "")
+			    		{
+			    			String test = status;
+			    		}
 	    			}
 	    		}
 	    	}
@@ -707,8 +733,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	{    
 		public void onLocationChanged(Location location)
 	    {
-	      // Called when a new location is found by the network location provider.
-	      //makeUseOfNewLocation(location);
+	      // Make use of new location
 	    }
 
 	    public void onStatusChanged(String provider, int status, Bundle extras) {}
