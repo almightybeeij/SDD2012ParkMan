@@ -90,7 +90,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	    mapOverlays = mapView.getOverlays();  
 	    mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
-	    //mapOverlays.add(new ParkingSpaceStudentOverlay());
 	    
         String coordinates[] = {"35.654108", "-97.473863"};
         double lat = Double.parseDouble(coordinates[0]);
@@ -147,13 +146,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		if (lastKnownLocation != null)
 		{
-			tvDialog.setText(Double.toString(lastKnownLocation.getLatitude()) +
-					", " + Double.toString(lastKnownLocation.getLongitude()));
-			
-			GeoPoint p = new GeoPoint((int) (lastKnownLocation.getLatitude() * 1E6),
-					(int) (lastKnownLocation.getLongitude() * 1E6));
-		 
-		    selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+			selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
 					"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
 		}
 		
@@ -216,6 +209,15 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		zoomInBounds(bounds);
 		mapView.invalidate();
+	}
+	
+	public void addParkingSpaces(ParkingLot lot)
+	{
+		for (ParkingSpace space : lot.getParkingSpaces())
+		{
+			mapOverlays.add(new ParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+					space.getCorners().get(2), space.getCorners().get(3)));
+		}
 	}
 	
 	public void zoomInBounds(ArrayList<GeoPoint> bounds) {
@@ -410,13 +412,27 @@ public class ViewParkingMapActivity extends MapActivity {
         }
 	}
 	
-	public class ParkingSpaceStudentOverlay extends Overlay
+	public class ParkingSpaceOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
 		
+		private GeoPoint gp1;
+	    private GeoPoint gp2;
+	    private GeoPoint gp3;
+	    private GeoPoint gp4;
+	    
 		private Paint fillPaint;
 		private Paint strokePaint;
     	private Path spacePath;
+    	
+    	public ParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
+    			GeoPoint corner3, GeoPoint corner4)
+    	{
+    		gp1 = corner1;
+    		gp2 = corner2;
+    		gp3 = corner3;
+    		gp4 = corner4;
+    	}
     	
 		private void init()
 		{
@@ -456,35 +472,23 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		Point coordInitial = new Point();
 	    		Point coordPoint = new Point();
 	    		
-	    		for (ParkingLot lot : studentParkingLots)
-	    		{
-	    			for (ParkingSpace space : lot.getParkingSpaces())
-	                {
-	                	int count = 0;
-	                	
-	                	GeoPoint initial = space.getCorners().get(0);
-		    			projection.toPixels(initial, coordInitial);
-		    			spacePath.moveTo(coordInitial.x, coordInitial.y);
-		    			
-		    			for (GeoPoint corner : space.getCorners())
-		    			{
-		    				count++;
-		    				
-		    				projection.toPixels(corner, coordPoint);
-		    				
-		    				if (count > 1)
-		    				{
-		    					spacePath.lineTo(coordPoint.x, coordPoint.y);
-		    				}
-		    			}
-		    			
-		    			spacePath.lineTo(coordInitial.x, coordInitial.y);
-		    			spacePath.close();
-		    			
-		    			canvas.drawPath(spacePath, strokePaint);            
-		                //canvas.drawPath(spacePath, fillPaint);
-	                }
-	    		}
+	    		projection.toPixels(gp1, coordInitial);
+    			spacePath.moveTo(coordInitial.x, coordInitial.y);
+    			
+    			projection.toPixels(gp2, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp3, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp4, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			spacePath.lineTo(coordInitial.x, coordInitial.y);
+    			
+    			spacePath.close();
+    			
+    			canvas.drawPath(spacePath, strokePaint);            
+                canvas.drawPath(spacePath, fillPaint);
 			}
 		}
 	}
@@ -798,8 +802,10 @@ public class ViewParkingMapActivity extends MapActivity {
 					    		
 					    		lotMatch.getParkingSpaces().add(space);
 					    	}
+			    			
+			    			addParkingSpaces(lotMatch);
 			    		}
-	    				
+			    		
 	    				mapView.postInvalidate();
 	    			}
 	    		}
