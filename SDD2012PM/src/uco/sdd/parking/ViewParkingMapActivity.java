@@ -731,6 +731,11 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		lot.addBoundary(json_data.getString("boundary2"));
 				    		lot.addBoundary(json_data.getString("boundary3"));
 				    		lot.addBoundary(json_data.getString("boundary4"));
+				    		
+				    		coordinatePair = json_data.getString("directionTo");
+				    		coordinates = coordinatePair.split(",");
+				    		lot.setDirectionTo(coordinates[1] + "," + coordinates[0]);
+				    		
 				    		lot.setParkingType("Faculty");
 				    	}
 	    				
