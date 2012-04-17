@@ -19,6 +19,7 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,7 +35,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class ViewParkingMapActivity extends MapActivity {
@@ -44,9 +47,11 @@ public class ViewParkingMapActivity extends MapActivity {
 	private List<Overlay> mapOverlays;
 	private List<ParkingLot> studentParkingLots;
 	private List<ParkingLot> facultyParkingLots;
+	private ParkingLot selectedLot;
 	private Projection projection;
 	private TextView tvDialog;
-	
+	private Route directions;
+	private AlertDialog dialog;
 	private LocationManager locationManager;
 	private String locationProvider;
 	private myLocationListener locationListener;
@@ -73,6 +78,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    
 	    studentParkingLots = new ArrayList<ParkingLot>();
 	    facultyParkingLots = new ArrayList<ParkingLot>();
+	    directions = new Route();
+	    dialog = new AlertDialog.Builder(this).create();
 	    
 	    mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
@@ -99,7 +106,6 @@ public class ViewParkingMapActivity extends MapActivity {
         
         selectParkingLotCoordinates(true, false);
         selectParkingLotCoordinates(false, true);
-        selectDirections("35.652937,-97.478342", "35.6589,-97.469459");
 	}
 	
 	@Override
@@ -127,6 +133,14 @@ public class ViewParkingMapActivity extends MapActivity {
 		}
 	}
 	
+	public void resetOverlays()
+	{
+		mapOverlays.clear();
+		
+		mapOverlays.add(new ParkingLotStudentOverlay());
+	    mapOverlays.add(new ParkingLotFacultyOverlay());
+	}
+	
 	public void getDirectionsOnClick(View view)
 	{
 		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
@@ -139,14 +153,17 @@ public class ViewParkingMapActivity extends MapActivity {
 			GeoPoint p = new GeoPoint((int) (lastKnownLocation.getLatitude() * 1E6),
 					(int) (lastKnownLocation.getLongitude() * 1E6));
 		 
-		    mc.animateTo(p);
+		    selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+					"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
 		}
+		
+		dialog.dismiss();
 	}
 	
 	public void selectDirections(String origin, String destination)
 	{
 		HTTPDataAccess dac = new HTTPDataAccess(this,
-    			"https://maps.googleapis.com/maps/api/directions/json?" +
+    			"http://maps.googleapis.com/maps/api/directions/json?" +
     			"origin=" + origin + "&destination=" + destination + "&sensor=false",
     			new GetDirectionsJSONListener());
 	    
@@ -155,6 +172,69 @@ public class ViewParkingMapActivity extends MapActivity {
 	    dac.setEncoding(HTTP.UTF_8);
     	
     	dac.executeSelectSingle();
+	}
+	
+	public void addDirections()
+	{
+		int size = directions.getSteps().size();
+		
+		resetOverlays();
+		
+		for (int index = 0; index < size; index++)
+		{
+			int polySize = directions.getSteps().get(index).getPolyPoints().size();
+			
+			if (polySize > 0)
+			{
+				mapOverlays.add(new DirectionPathOverlay(directions.getSteps().get(index).getStartLocation(),
+					directions.getSteps().get(index).getPolyPoints().get(0)));
+				
+				for (int polyPoint = 0; polyPoint < polySize; polyPoint++)
+				{
+					if (polyPoint + 1 == polySize)
+					{
+						mapOverlays.add(new DirectionPathOverlay(directions.getSteps().get(index).getPolyPoints().get(polyPoint),
+							directions.getSteps().get(index).getEndLocation()));
+					}
+					else
+					{
+						mapOverlays.add(new DirectionPathOverlay(directions.getSteps().get(index).getPolyPoints().get(polyPoint),
+								directions.getSteps().get(index).getPolyPoints().get(polyPoint + 1)));
+					}
+				}
+			}
+			else
+			{
+				mapOverlays.add(new DirectionPathOverlay(directions.getSteps().get(index).getStartLocation(),
+					directions.getSteps().get(index).getEndLocation()));
+			}
+		}
+		
+		ArrayList<GeoPoint> bounds = new ArrayList<GeoPoint>();
+		bounds.add(directions.getBoundsNE());
+		bounds.add(directions.getBoundsSW());
+		
+		zoomInBounds(bounds);
+		mapView.invalidate();
+	}
+	
+	public void zoomInBounds(ArrayList<GeoPoint> bounds) {
+
+	    int minLat = Integer.MAX_VALUE;
+	    int minLong = Integer.MAX_VALUE;
+	    int maxLat = Integer.MIN_VALUE;
+	    int maxLong = Integer.MIN_VALUE;
+
+	    for (GeoPoint point : bounds) {
+	        minLat = Math.min(point.getLatitudeE6(), minLat);
+	        minLong = Math.min(point.getLongitudeE6(), minLong);
+	        maxLat = Math.max(point.getLatitudeE6(), maxLat);
+	        maxLong = Math.max(point.getLongitudeE6(), maxLong);
+	    }
+
+	    mc.zoomToSpan(Math.abs(minLat - maxLat), Math.abs(minLong - maxLong));
+	    mc.animateTo(new GeoPoint((maxLat + minLat) / 2,
+	        (maxLong + minLong) / 2));
 	}
 	
 	public void selectParkingLotCoordinates(boolean studentLot, boolean facultyLot)
@@ -193,17 +273,37 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	public void showParkingLotDialog(ParkingLot lot)
 	{
-		LayoutInflater inflater = getLayoutInflater();
+		selectedLot = lot;
 		
+		LayoutInflater inflater = getLayoutInflater();		
 		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
+
+		dialog.setView(dialoglayout);
+		dialog.setTitle("Parking Lot " + Integer.toString(lot.getLotId()));
 		
 		tvDialog = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_test);
 		tvDialog.setText("Type: " + lot.getParkingType());
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Parking Lot " + Integer.toString(lot.getLotId()));
-		builder.setView(dialoglayout);
-		builder.show();
+		Button btnGetDirections = (Button)dialoglayout.findViewById(R.id.viewparking_id_getdirections);
+		btnGetDirections.setOnClickListener(new GetDirectionsOnClickListener());
+		
+		dialog.show();
+	}
+	
+	public class GetDirectionsOnClickListener implements OnClickListener
+	{
+		public void onClick(View view)
+		{
+			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+			
+			if (lastKnownLocation != null)
+			{
+				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+			}
+			
+			dialog.dismiss();
+		}
 	}
 	
 	public class ParkingLotStudentOverlay extends Overlay
@@ -508,12 +608,11 @@ public class ViewParkingMapActivity extends MapActivity {
 		{
 			strokePaint = new Paint();
 			strokePaint.setAntiAlias(true);
-            strokePaint.setColor(getResources().getColor(R.color.blue));
+            strokePaint.setColor(getResources().getColor(R.color.brightblue));
             strokePaint.setStyle(Paint.Style.STROKE);
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
-            strokePaint.setStrokeWidth(2);
-            strokePaint.setAlpha(180);
+            strokePaint.setStrokeWidth(3);
 		}
 	    
 	    @Override
@@ -576,6 +675,11 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		lot.addBoundary(json_data.getString("boundary2"));
 				    		lot.addBoundary(json_data.getString("boundary3"));
 				    		lot.addBoundary(json_data.getString("boundary4"));
+				    		
+				    		coordinatePair = json_data.getString("directionTo");
+				    		coordinates = coordinatePair.split(",");
+				    		lot.setDirectionTo(coordinates[1] + "," + coordinates[0]);
+				    		
 				    		lot.setParkingType("Student");
 				    	}
 	    				
@@ -709,17 +813,81 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		public void onRemoteCallComplete(JSONObject jObject) {
 			
+			double lat;
+			double lng;
+			String polyLine;
+			
+			RouteStep step;
+			JSONArray jArray = new JSONArray();
+			JSONArray jLegs = new JSONArray();
+			JSONArray jSteps = new JSONArray();
+			
+			JSONObject jRoute;
+			JSONObject jLeg;
+			JSONObject jStep;
+			JSONObject jBounds;
+			
 			try
 	    	{
 	    		if (jObject != null)
 	    		{
 	    			if (jObject.length() > 0)
 	    			{
-			    		String status = jObject.getString("status");
-			    		if (status != "")
-			    		{
-			    			String test = status;
-			    		}
+	    				jArray = jObject.getJSONArray("routes");
+	    				jRoute = jArray.getJSONObject(0);
+	    				
+	    				jLegs = jRoute.getJSONArray("legs");
+	    				jLeg = jLegs.getJSONObject(0);
+	    				jSteps = jLeg.getJSONArray("steps");
+	    				jBounds = jRoute.getJSONObject("bounds");
+	    				
+			    		directions.setDistance(jLeg.getJSONObject("distance").getString("text"));
+			    		directions.setDuration(jLeg.getJSONObject("duration").getString("text"));
+			    		directions.setStartAddress(jLeg.getString("start_address"));
+			    		directions.setEndAddress(jLeg.getString("end_address"));
+			    		
+			    		lat = Double.parseDouble(jBounds.getJSONObject("northeast").getString("lat"));
+			            lng = Double.parseDouble(jBounds.getJSONObject("northeast").getString("lng"));
+			    		directions.setBoundsNE(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+			    		
+			    		lat = Double.parseDouble(jBounds.getJSONObject("southwest").getString("lat"));
+			            lng = Double.parseDouble(jBounds.getJSONObject("southwest").getString("lng"));
+			    		directions.setBoundsSW(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+			    		
+			    		lat = Double.parseDouble(jLeg.getJSONObject("start_location").getString("lat"));
+			            lng = Double.parseDouble(jLeg.getJSONObject("start_location").getString("lng"));
+			    		directions.setStartLocation(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+			    		
+			    		lat = Double.parseDouble(jLeg.getJSONObject("end_location").getString("lat"));
+			            lng = Double.parseDouble(jLeg.getJSONObject("end_location").getString("lng"));
+			    		directions.setEndLocation(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+			    		
+			    		for(int index = 0; index < jSteps.length(); index++)
+				    	{
+			    			polyLine = "";
+				    		jStep = jSteps.getJSONObject(index);
+				    		
+				    		step = new RouteStep();
+				    		step.setDistance(jStep.getJSONObject("distance").getString("text"));
+				    		step.setDuration(jStep.getJSONObject("duration").getString("text"));
+				    		step.setInstructions(jStep.getString("html_instructions"));
+				    		step.setTravelMode(jStep.getString("travel_mode"));
+				    		
+				    		lat = Double.parseDouble(jStep.getJSONObject("start_location").getString("lat"));
+				    		lng = Double.parseDouble(jStep.getJSONObject("start_location").getString("lng"));
+				    		step.setStartLocation(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+				    		
+				    		lat = Double.parseDouble(jStep.getJSONObject("end_location").getString("lat"));
+				    		lng = Double.parseDouble(jStep.getJSONObject("end_location").getString("lng"));
+				    		step.setEndLocation(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
+				    		
+				    		polyLine = jStep.getJSONObject("polyline").getString("points");
+				    		step.setPolyPoints(decodePoly(polyLine));
+				    		
+				    		directions.getSteps().add(step);
+				    	}
+			    		
+			    		addDirections();
 	    			}
 	    		}
 	    	}
@@ -727,6 +895,51 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		e.printStackTrace();
 	    	}
 		}
+	}
+	
+	private List<GeoPoint> decodePoly(String encoded) {
+
+	    List<GeoPoint> poly = new ArrayList<GeoPoint>();
+	    
+	    int index = 0;
+	    int len = encoded.length();
+	    int lat = 0;
+	    int lng = 0;
+
+	    while (index < len) {
+	    	
+	        int b;
+	        int shift = 0;
+	        int result = 0;
+	        
+	        do
+	        {
+	            b = encoded.charAt(index++) - 63;
+	            result |= (b & 0x1f) << shift;
+	            shift += 5;
+	        } while (b >= 0x20);
+	        int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+	        lat += dlat;
+
+	        shift = 0;
+	        result = 0;
+	        
+	        do
+	        {
+	            b = encoded.charAt(index++) - 63;
+	            result |= (b & 0x1f) << shift;
+	            shift += 5;
+	        } while (b >= 0x20);
+	        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+	        lng += dlng;
+
+	        GeoPoint p = new GeoPoint((int) (((double) lat / 1E5) * 1E6),
+	             (int) (((double) lng / 1E5) * 1E6));
+	        
+	        poly.add(p);
+	    }
+
+	    return poly;
 	}
 	
 	public class myLocationListener implements LocationListener

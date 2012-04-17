@@ -12,6 +12,7 @@ public class ParkingLot {
 	private boolean isStudent;
 	private boolean isFaculty;
 	private String parkingType;
+	private String directionTo;
 	
 	private ArrayList<GeoPoint> coordinates;
 	private ArrayList<GeoPoint> boundaries;
@@ -86,6 +87,14 @@ public class ParkingLot {
 		this.parkingSpaces = parkingSpaces;
 	}
 
+	public String getDirectionTo() {
+		return directionTo;
+	}
+
+	public void setDirectionTo(String directionTo) {
+		this.directionTo = directionTo;
+	}
+
 	public Path getLotPath() {
 		return lotPath;
 	}
@@ -117,7 +126,7 @@ public class ParkingLot {
         
         boundaries.add(p);
 	}
-
+	
 	@Override
 	public int hashCode() {
 		

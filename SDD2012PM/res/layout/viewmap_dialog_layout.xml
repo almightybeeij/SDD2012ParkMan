@@ -14,6 +14,7 @@
 	<Button android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:text="@string/viewparking_btn_getdirections"
-	    android:onClick="getDirectionsOnClick" />
+	    android:onClick="getDirectionsOnClick" 
+	    android:id="@+id/viewparking_id_getdirections" />"
 		
 </LinearLayout>
