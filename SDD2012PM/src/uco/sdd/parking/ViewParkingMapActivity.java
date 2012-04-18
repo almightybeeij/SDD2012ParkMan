@@ -56,6 +56,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	private String locationProvider;
 	private myLocationListener locationListener;
 	
+	private static final float GESTURE_THRESHOLD_DIP = 16.0f;
+	
 	@Override
 	protected boolean isRouteDisplayed() {
 		
@@ -211,11 +213,20 @@ public class ViewParkingMapActivity extends MapActivity {
 		mapView.invalidate();
 	}
 	
-	public void addParkingSpaces(ParkingLot lot)
+	public void addStudentParkingSpaces(ParkingLot lot)
 	{
 		for (ParkingSpace space : lot.getParkingSpaces())
 		{
-			mapOverlays.add(new ParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+			mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+					space.getCorners().get(2), space.getCorners().get(3)));
+		}
+	}
+	
+	public void addFacultyParkingSpaces(ParkingLot lot)
+	{
+		for (ParkingSpace space : lot.getParkingSpaces())
+		{
+			mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
 					space.getCorners().get(2), space.getCorners().get(3)));
 		}
 	}
@@ -327,7 +338,7 @@ public class ViewParkingMapActivity extends MapActivity {
             strokePaint.setAlpha(100);
             
             fillPaint = new Paint();
-			fillPaint.setAntiAlias(true);
+			fillPaint.setAntiAlias(false);
             fillPaint.setColor(Color.RED);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -376,10 +387,12 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			lotPath.lineTo(coordInitial.x, coordInitial.y);
 	    			lotPath.close();
 	    			
+	    			projection.toPixels(lot.getCoordinates().get(3), coordPoint);
+	    			
 	    			canvas.drawPath(lotPath, strokePaint);            
 	                canvas.drawPath(lotPath, fillPaint);
 	                canvas.drawText(Integer.toString(lot.getLotId()),
-	                		coordPoint.x + 10, coordPoint.y + 20, strokePaint);
+	                		coordPoint.x + 10, coordPoint.y - 10, strokePaint);
 	    		}
 			}
 		}
@@ -412,7 +425,7 @@ public class ViewParkingMapActivity extends MapActivity {
         }
 	}
 	
-	public class ParkingSpaceOverlay extends Overlay
+	public class StudentParkingSpaceOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
 		
@@ -425,7 +438,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		private Paint strokePaint;
     	private Path spacePath;
     	
-    	public ParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
+    	public StudentParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
     			GeoPoint corner3, GeoPoint corner4)
     	{
     		gp1 = corner1;
@@ -437,7 +450,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		private void init()
 		{
 			strokePaint = new Paint();
-			strokePaint.setAntiAlias(false);
+			strokePaint.setAntiAlias(true);
             strokePaint.setColor(getResources().getColor(R.color.black));
             strokePaint.setStyle(Paint.Style.STROKE);
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
@@ -448,6 +461,87 @@ public class ViewParkingMapActivity extends MapActivity {
             fillPaint = new Paint();
 			fillPaint.setAntiAlias(false);
             fillPaint.setColor(Color.RED);
+            fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            fillPaint.setStrokeJoin(Paint.Join.ROUND);
+            fillPaint.setStrokeCap(Paint.Cap.ROUND);
+            fillPaint.setStrokeWidth(1);
+            fillPaint.setAlpha(60);
+		}
+		
+		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
+    		
+			super.draw(canvas, mapv, shadow);
+    		
+			if (shadow == false)
+			{
+	    		if (!isInitialized)
+	    		{
+	    			this.init();
+	    			this.isInitialized = true;
+	    		}
+	    		
+	    		spacePath = new Path();
+	    		
+	    		Point coordInitial = new Point();
+	    		Point coordPoint = new Point();
+	    		
+	    		projection.toPixels(gp1, coordInitial);
+    			spacePath.moveTo(coordInitial.x, coordInitial.y);
+    			
+    			projection.toPixels(gp2, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp3, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp4, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			spacePath.lineTo(coordInitial.x, coordInitial.y);
+    			
+    			spacePath.close();
+    			
+    			canvas.drawPath(spacePath, strokePaint);            
+                canvas.drawPath(spacePath, fillPaint);
+			}
+		}
+	}
+	
+	public class FacultyParkingSpaceOverlay extends Overlay
+	{
+		private boolean isInitialized = false;
+		
+		private GeoPoint gp1;
+	    private GeoPoint gp2;
+	    private GeoPoint gp3;
+	    private GeoPoint gp4;
+	    
+		private Paint fillPaint;
+		private Paint strokePaint;
+    	private Path spacePath;
+    	
+    	public FacultyParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
+    			GeoPoint corner3, GeoPoint corner4)
+    	{
+    		gp1 = corner1;
+    		gp2 = corner2;
+    		gp3 = corner3;
+    		gp4 = corner4;
+    	}
+    	
+		private void init()
+		{
+			strokePaint = new Paint();
+			strokePaint.setAntiAlias(true);
+            strokePaint.setColor(getResources().getColor(R.color.navy));
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeWidth(1);
+            strokePaint.setAlpha(40);
+            
+            fillPaint = new Paint();
+			fillPaint.setAntiAlias(false);
+            fillPaint.setColor(Color.BLUE);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
             fillPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -509,10 +603,15 @@ public class ViewParkingMapActivity extends MapActivity {
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
             strokePaint.setStrokeWidth(2);
+            
+            //final float scale = getResources().getDisplayMetrics().density;
+            //final float mGestureThreshold = (GESTURE_THRESHOLD_DIP * scale + 0.5f);
+            
+            //strokePaint.setTextSize(mGestureThreshold);
             strokePaint.setAlpha(100);
             
             fillPaint = new Paint();
-			fillPaint.setAntiAlias(true);
+			fillPaint.setAntiAlias(false);
             fillPaint.setColor(Color.BLUE);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -561,9 +660,11 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			lotPath.lineTo(coordInitial.x, coordInitial.y);
 	    			lotPath.close();
 	    			
+	    			projection.toPixels(lot.getCoordinates().get(2), coordPoint);
+	    			
 	    			canvas.drawPath(lotPath, strokePaint);            
 	                canvas.drawPath(lotPath, fillPaint);
-	                canvas.drawText(Integer.toString(lot.getLotId()), coordPoint.x + 10, coordPoint.y - 15, strokePaint); 
+	                canvas.drawText(Integer.toString(lot.getLotId()), coordPoint.x + 10, coordPoint.y - 10, strokePaint); 
 	    		}
 			}
 		}
@@ -746,6 +847,11 @@ public class ViewParkingMapActivity extends MapActivity {
 	    				lot.setLotId(lotId);
 	    				facultyParkingLots.add(lot);
 	    				mapView.postInvalidate();
+	    				
+	    				for (ParkingLot facultyLot : facultyParkingLots)
+	    				{
+	    					selectParkingSpaces(facultyLot.getLotId(), new FacultySpacesJSONListener());
+	    				}
 	    			}
 	    		}
 	    	}
@@ -803,7 +909,68 @@ public class ViewParkingMapActivity extends MapActivity {
 					    		lotMatch.getParkingSpaces().add(space);
 					    	}
 			    			
-			    			addParkingSpaces(lotMatch);
+			    			addStudentParkingSpaces(lotMatch);
+			    		}
+			    		
+	    				mapView.postInvalidate();
+	    			}
+	    		}
+	    	}
+	    	catch (JSONException e)	{
+	    		e.printStackTrace();
+	    	}
+		}
+		
+		public void onRemoteCallComplete(JSONObject jObject) {}
+	}
+	
+	private class FacultySpacesJSONListener implements GetJSONListener
+	{
+		public void onRemoteCallComplete(JSONArray jArray) {
+			    
+			ParkingLot lotLookFor;
+			ParkingLot lotMatch;
+			ParkingSpace space;
+			JSONObject json_data;
+			
+			try
+	    	{
+	    		if (jArray != null)
+	    		{
+	    			if (jArray.length() > 0)
+	    			{
+	    				lotLookFor = new ParkingLot();
+	    				lotMatch = new ParkingLot();
+	    				
+	    				json_data = jArray.getJSONObject(0);
+	    				
+	    				int lotId = json_data.getInt("ParkingLot_lotId");
+			    		lotLookFor.setLotId(lotId);
+			    		
+			    		int match = facultyParkingLots.indexOf(lotLookFor);
+			    		
+			    		if (match != -1)
+			    		{
+			    			lotMatch = facultyParkingLots.get(match);
+			    			
+			    			for(int index = 0; index < jArray.length(); index++)
+					    	{
+					    		json_data = jArray.getJSONObject(index);
+					    		
+					    		space = new ParkingSpace();
+					    		space.setSpaceId(json_data.getInt("spaceId"));
+					    		space.setClientEmail(json_data.getString("Client_email"));
+					    		space.addCorner(json_data.getString("corner1"));
+					    		space.addCorner(json_data.getString("corner2"));
+					    		space.addCorner(json_data.getString("corner3"));
+					    		space.addCorner(json_data.getString("corner4"));
+					    		space.setAvailable(BooleanFromString(json_data.getString("available")));
+					    		space.setHandicap(BooleanFromString(json_data.getString("handicap")));
+					    		
+					    		lotMatch.getParkingSpaces().add(space);
+					    	}
+			    			
+			    			addFacultyParkingSpaces(lotMatch);
 			    		}
 			    		
 	    				mapView.postInvalidate();
