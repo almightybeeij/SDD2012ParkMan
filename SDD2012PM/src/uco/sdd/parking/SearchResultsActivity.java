@@ -4,8 +4,14 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class SearchResultsActivity extends ListActivity {
 
@@ -38,4 +44,22 @@ public class SearchResultsActivity extends ListActivity {
 	    		R.id.searchresults_parkingspace, parkingSpaces));
 	}
 
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+    	
+    	Intent i = null;
+		super.onListItemClick(l, v, position, id);
+				
+		LinearLayout spaceLayout = (LinearLayout)v;
+		TextView tvSpace = (TextView)spaceLayout.findViewById(R.id.searchresults_parkingspace);
+		String space = tvSpace.getText().toString();
+		String[] spaceElements = space.split(" ");
+		
+		i = new Intent(getApplicationContext(), ViewParkingMapActivity.class);
+		i.putExtra("lotId", lotId);
+		i.putExtra("spaceId", spaceElements[1]);
+		
+		startActivity(i);
+		i = null;
+	}
 }

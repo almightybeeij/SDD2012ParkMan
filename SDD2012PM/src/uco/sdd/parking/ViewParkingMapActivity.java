@@ -19,7 +19,6 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -41,7 +40,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class ViewParkingMapActivity extends MapActivity {
-
+	
+	private String locationProvider;
+	private String viewSpaceId;
+	private String viewLotId;
+	private boolean viewSpace;
+	
 	private MapView mapView;
 	private MapController mc;
 	private List<Overlay> mapOverlays;
@@ -53,10 +57,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	private Route directions;
 	private AlertDialog dialog;
 	private LocationManager locationManager;
-	private String locationProvider;
-	private myLocationListener locationListener;
-	
-	private static final float GESTURE_THRESHOLD_DIP = 16.0f;
+	private MyLocationListener locationListener;
 	
 	@Override
 	protected boolean isRouteDisplayed() {
@@ -74,7 +75,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
 	    
 	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	    locationListener = new myLocationListener();
+	    locationListener = new MyLocationListener();
 	    locationProvider = locationManager.getBestProvider(criteria, true);
 	    locationManager.requestLocationUpdates(locationProvider, 1000, 0, locationListener);
 	    
@@ -102,8 +103,15 @@ public class ViewParkingMapActivity extends MapActivity {
             (int) (lng * 1E6));
  
         mc.animateTo(p);
-        
         mc.setZoom(19); 
+        
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+        {
+        	viewSpace = true;
+        	viewSpaceId = extras.getString("spaceId");
+        	viewLotId = extras.getString("lotId");
+        }
         
         selectParkingLotCoordinates(true, false);
         selectParkingLotCoordinates(false, true);
@@ -140,6 +148,16 @@ public class ViewParkingMapActivity extends MapActivity {
 		
 		mapOverlays.add(new ParkingLotStudentOverlay());
 	    mapOverlays.add(new ParkingLotFacultyOverlay());
+	    
+	    for (ParkingLot lot : studentParkingLots)
+	    {
+	    	addStudentParkingSpaces(lot);
+	    }
+	    
+	    for (ParkingLot lot : facultyParkingLots)
+	    {
+	    	addFacultyParkingSpaces(lot);
+	    }
 	}
 	
 	public void getDirectionsOnClick(View view)
@@ -215,19 +233,65 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	public void addStudentParkingSpaces(ParkingLot lot)
 	{
-		for (ParkingSpace space : lot.getParkingSpaces())
+		int matchLotId = Integer.parseInt(viewLotId);
+		
+		if (viewSpace && lot.getLotId() == matchLotId)
 		{
-			mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-					space.getCorners().get(2), space.getCorners().get(3)));
+			int matchId = Integer.parseInt(viewSpaceId);
+						
+			for (ParkingSpace space : lot.getParkingSpaces())
+			{
+				if (space.getSpaceId() != matchId)
+				{
+					mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+				}
+				else
+				{
+					mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3)));
+				}
+			}
+		}
+		else
+		{
+			for (ParkingSpace space : lot.getParkingSpaces())
+			{
+				mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+			}
 		}
 	}
 	
 	public void addFacultyParkingSpaces(ParkingLot lot)
 	{
-		for (ParkingSpace space : lot.getParkingSpaces())
+		int matchLotId = Integer.parseInt(viewLotId);
+		
+		if (viewSpace && lot.getLotId() == matchLotId)
 		{
-			mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-					space.getCorners().get(2), space.getCorners().get(3)));
+			int matchId = Integer.parseInt(viewSpaceId);
+						
+			for (ParkingSpace space : lot.getParkingSpaces())
+			{
+				if (space.getSpaceId() != matchId)
+				{
+					mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+				}
+				else
+				{
+					mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3)));
+				}
+			}
+		}
+		else
+		{
+			for (ParkingSpace space : lot.getParkingSpaces())
+			{
+				mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+			}
 		}
 	}
 	
@@ -428,6 +492,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	public class StudentParkingSpaceOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
+		private boolean isAvailable = false;
 		
 		private GeoPoint gp1;
 	    private GeoPoint gp2;
@@ -439,12 +504,13 @@ public class ViewParkingMapActivity extends MapActivity {
     	private Path spacePath;
     	
     	public StudentParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
-    			GeoPoint corner3, GeoPoint corner4)
+    			GeoPoint corner3, GeoPoint corner4, boolean available)
     	{
     		gp1 = corner1;
     		gp2 = corner2;
     		gp3 = corner3;
     		gp4 = corner4;
+    		isAvailable = available;
     	}
     	
 		private void init()
@@ -459,13 +525,20 @@ public class ViewParkingMapActivity extends MapActivity {
             strokePaint.setAlpha(40);
             
             fillPaint = new Paint();
+            
+            if (isAvailable) {
+            	fillPaint.setColor(Color.RED);
+            }
+            else {
+            	fillPaint.setColor(Color.BLACK);
+            }
+            
 			fillPaint.setAntiAlias(false);
-            fillPaint.setColor(Color.RED);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
             fillPaint.setStrokeCap(Paint.Cap.ROUND);
             fillPaint.setStrokeWidth(1);
-            fillPaint.setAlpha(60);
+            fillPaint.setAlpha(130);	
 		}
 		
 		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
@@ -509,6 +582,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	public class FacultyParkingSpaceOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
+		private boolean isAvailable = false;
 		
 		private GeoPoint gp1;
 	    private GeoPoint gp2;
@@ -520,12 +594,13 @@ public class ViewParkingMapActivity extends MapActivity {
     	private Path spacePath;
     	
     	public FacultyParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
-    			GeoPoint corner3, GeoPoint corner4)
+    			GeoPoint corner3, GeoPoint corner4, boolean available)
     	{
     		gp1 = corner1;
     		gp2 = corner2;
     		gp3 = corner3;
     		gp4 = corner4;
+    		isAvailable = available;
     	}
     	
 		private void init()
@@ -540,13 +615,101 @@ public class ViewParkingMapActivity extends MapActivity {
             strokePaint.setAlpha(40);
             
             fillPaint = new Paint();
+            
+            if (isAvailable) {
+            	fillPaint.setColor(Color.BLUE);
+            }
+            else {
+            	fillPaint.setColor(Color.BLACK);
+            }
+            
 			fillPaint.setAntiAlias(false);
-            fillPaint.setColor(Color.BLUE);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
             fillPaint.setStrokeCap(Paint.Cap.ROUND);
             fillPaint.setStrokeWidth(1);
-            fillPaint.setAlpha(60);
+            fillPaint.setAlpha(130);
+		}
+		
+		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
+    		
+			super.draw(canvas, mapv, shadow);
+    		
+			if (shadow == false)
+			{
+	    		if (!isInitialized)
+	    		{
+	    			this.init();
+	    			this.isInitialized = true;
+	    		}
+	    		
+	    		spacePath = new Path();
+	    		
+	    		Point coordInitial = new Point();
+	    		Point coordPoint = new Point();
+	    		
+	    		projection.toPixels(gp1, coordInitial);
+    			spacePath.moveTo(coordInitial.x, coordInitial.y);
+    			
+    			projection.toPixels(gp2, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp3, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp4, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			spacePath.lineTo(coordInitial.x, coordInitial.y);
+    			
+    			spacePath.close();
+    			
+    			canvas.drawPath(spacePath, strokePaint);            
+                canvas.drawPath(spacePath, fillPaint);
+			}
+		}
+	}
+	
+	public class ViewParkingSpaceOverlay extends Overlay
+	{
+		private boolean isInitialized = false;
+		
+		private GeoPoint gp1;
+	    private GeoPoint gp2;
+	    private GeoPoint gp3;
+	    private GeoPoint gp4;
+	    
+		private Paint fillPaint;
+		private Paint strokePaint;
+    	private Path spacePath;
+    	
+    	public ViewParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
+    			GeoPoint corner3, GeoPoint corner4)
+    	{
+    		gp1 = corner1;
+    		gp2 = corner2;
+    		gp3 = corner3;
+    		gp4 = corner4;
+    	}
+    	
+		private void init()
+		{
+			strokePaint = new Paint();
+			strokePaint.setAntiAlias(true);
+            strokePaint.setColor(getResources().getColor(R.color.uco_yellow));
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeWidth(1);
+            strokePaint.setAlpha(200);
+            
+            fillPaint = new Paint();
+            fillPaint.setColor(getResources().getColor(R.color.uco_yellow));            
+			fillPaint.setAntiAlias(false);
+            fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            fillPaint.setStrokeJoin(Paint.Join.ROUND);
+            fillPaint.setStrokeCap(Paint.Cap.ROUND);
+            fillPaint.setStrokeWidth(1);
+            fillPaint.setAlpha(160);	
 		}
 		
 		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
@@ -903,8 +1066,8 @@ public class ViewParkingMapActivity extends MapActivity {
 					    		space.addCorner(json_data.getString("corner2"));
 					    		space.addCorner(json_data.getString("corner3"));
 					    		space.addCorner(json_data.getString("corner4"));
-					    		space.setAvailable(BooleanFromString(json_data.getString("available")));
-					    		space.setHandicap(BooleanFromString(json_data.getString("handicap")));
+					    		space.setAvailable(BooleanFromInt(json_data.getInt("available")));
+					    		space.setHandicap(BooleanFromInt(json_data.getInt("handicap")));
 					    		
 					    		lotMatch.getParkingSpaces().add(space);
 					    	}
@@ -964,8 +1127,8 @@ public class ViewParkingMapActivity extends MapActivity {
 					    		space.addCorner(json_data.getString("corner2"));
 					    		space.addCorner(json_data.getString("corner3"));
 					    		space.addCorner(json_data.getString("corner4"));
-					    		space.setAvailable(BooleanFromString(json_data.getString("available")));
-					    		space.setHandicap(BooleanFromString(json_data.getString("handicap")));
+					    		space.setAvailable(BooleanFromInt(json_data.getInt("available")));
+					    		space.setHandicap(BooleanFromInt(json_data.getInt("handicap")));
 					    		
 					    		lotMatch.getParkingSpaces().add(space);
 					    	}
@@ -1120,7 +1283,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    return poly;
 	}
 	
-	public class myLocationListener implements LocationListener
+	public class MyLocationListener implements LocationListener
 	{    
 		public void onLocationChanged(Location location)
 	    {
@@ -1134,9 +1297,9 @@ public class ViewParkingMapActivity extends MapActivity {
 	    public void onProviderDisabled(String provider) {}
 	}
 	  
-	private boolean BooleanFromString(String value)
+	private boolean BooleanFromInt(int value)
 	{
-		if (value == "1")
+		if (value == 1)
 			return true;
 		else
 			return false;

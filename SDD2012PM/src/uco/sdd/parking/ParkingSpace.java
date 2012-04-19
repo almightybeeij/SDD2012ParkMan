@@ -77,4 +77,40 @@ public class ParkingSpace {
         
         corners.add(p);
 	}
+
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		
+		result = prime * result + spaceId;
+		
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (this == obj) {
+			return true;
+		}
+		
+		if (obj == null) {
+			return false;
+		}
+		
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		
+		ParkingSpace other = (ParkingSpace) obj;
+		
+		if (spaceId != other.spaceId) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 }
