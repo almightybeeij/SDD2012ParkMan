@@ -160,18 +160,18 @@ public class ViewParkingMapActivity extends MapActivity {
 	    }
 	}
 	
-	public void getDirectionsOnClick(View view)
-	{
-		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-		
-		if (lastKnownLocation != null)
-		{
-			selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
-					"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
-		}
-		
-		dialog.dismiss();
-	}
+//	public void getDirectionsOnClick(View view)
+//	{
+//		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+//		
+//		if (lastKnownLocation != null)
+//		{
+//			selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+//					"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+//		}
+//		
+//		dialog.dismiss();
+//	}
 	
 	public void selectDirections(String origin, String destination)
 	{

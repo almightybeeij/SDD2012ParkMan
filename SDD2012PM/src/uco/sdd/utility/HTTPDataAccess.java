@@ -196,7 +196,7 @@ public class HTTPDataAccess {
 			if (usingProgress)
 			{
 		        progressDialog = new ProgressDialog(currentContext);
-		        progressDialog.setMessage("Loading..Please wait..");
+		        progressDialog.setMessage("Loading, Please wait...");
 		        progressDialog.setCancelable(false);
 		        progressDialog.setIndeterminate(true);
 		        progressDialog.show();
