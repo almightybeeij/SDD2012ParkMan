@@ -381,6 +381,8 @@ public class ViewParkingMapActivity extends MapActivity {
 			
 			if (lastKnownLocation != null)
 			{
+				//selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
+				
 				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
 						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
 			}
