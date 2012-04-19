@@ -9,7 +9,8 @@
 	    android:layout_height="wrap_content" 
 	    android:id="@+id/viewmap_dlg_test"
 	    android:paddingTop="10sp"
-	    android:text="@string/viewparking_dlg_test" />
+	    android:text="@string/viewparking_dlg_test"
+	    android:layout_marginBottom="15sp" />
 	
 	<Button android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"

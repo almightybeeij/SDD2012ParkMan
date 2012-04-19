@@ -15,7 +15,8 @@
         android:textSize="25sp"
         android:text="@string/login_lbl_title"
         android:paddingBottom="15sp"
-        android:paddingTop="15sp" />
+        android:paddingTop="15sp"
+        android:textColor="@color/uco_yellow" />
     
 	<TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 

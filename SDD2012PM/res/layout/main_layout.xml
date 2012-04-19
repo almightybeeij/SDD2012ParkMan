@@ -7,8 +7,11 @@
     <TextView android:id="@+id/main_tvw_welcome"
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10sp"
-        android:layout_marginBottom="10sp" />"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
+        android:paddingLeft="10sp"
+        android:background="@color/uco_blue"
+        android:textColor="@color/uco_yellow" />"
     
     <ImageView android:src="@android:drawable/divider_horizontal_dark"
         android:contentDescription="@string/main_img_desc_divider"

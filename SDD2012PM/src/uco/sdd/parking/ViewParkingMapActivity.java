@@ -233,7 +233,10 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	public void addStudentParkingSpaces(ParkingLot lot)
 	{
-		int matchLotId = Integer.parseInt(viewLotId);
+		int matchLotId = -1;
+		
+		if (viewLotId != null)
+			matchLotId = Integer.parseInt(viewLotId);
 		
 		if (viewSpace && lot.getLotId() == matchLotId)
 		{
@@ -265,7 +268,10 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	public void addFacultyParkingSpaces(ParkingLot lot)
 	{
-		int matchLotId = Integer.parseInt(viewLotId);
+		int matchLotId = -1;
+		
+		if (viewLotId != null)
+			matchLotId = Integer.parseInt(viewLotId);
 		
 		if (viewSpace && lot.getLotId() == matchLotId)
 		{
