@@ -20,14 +20,14 @@
         <activity android:name=".MainActivity"
         	android:label="@string/app_name">
         </activity>
-        <activity android:name="SearchActivity"
+        <activity android:name=".SearchActivity"
             android:label="@string/search_act_title">            
         </activity>
-        <activity android:name="ViewParkingMapActivity"
+        <activity android:name=".ViewParkingMapActivity"
             android:label="@string/app_name">            
         </activity>
         <uses-library android:name="com.google.android.maps" />
-        <activity android:name="SearchResultsActivity"
+        <activity android:name=".SearchResultsActivity"
             android:label="@string/app_name">            
         </activity>
     </application>

@@ -586,7 +586,7 @@ public class ViewParkingMapActivity extends MapActivity {
 			}
 		}
 	}
-	
+
 	public class FacultyParkingSpaceOverlay extends Overlay
 	{
 		private boolean isInitialized = false;
