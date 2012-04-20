@@ -1,3 +1,18 @@
+/*
+ * SearchResultsActivity Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents the screen used to display the search results
+ * returned from the SearchActivity class.  Allows the user
+ * to select a single result or space and view it using the
+ * ViewParkingMapActivity.
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
@@ -33,14 +48,16 @@ public class SearchResultsActivity extends ListActivity {
 	    {
 	    	count++;
 	    	
-	    	if (count == 1)
+	    	if (count == 1) {
 	    		lotId = extras.getString(key);
-	    	else
+	    	}
+	    	else {
 	    		parkingSpaces.add(extras.getString(key));
+	    	}
 	    }
 	    
 	    setListAdapter(new ArrayAdapter<String>(this, R.layout.searchresults_list_item,
-	    		R.id.searchresults_parkingspace, parkingSpaces));
+	    	R.id.searchresults_parkingspace, parkingSpaces));
 	}
 
 	@Override

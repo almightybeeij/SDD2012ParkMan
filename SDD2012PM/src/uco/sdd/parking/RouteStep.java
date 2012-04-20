@@ -1,3 +1,17 @@
+/*
+ * RouteStep Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents a route step or direction step returned by the
+ * Google Directions API. Data is used to draw or overlay the
+ * directions onto a MapView.
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
