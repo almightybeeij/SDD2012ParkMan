@@ -136,6 +136,13 @@ public class ViewParkingMapActivity extends MapActivity {
 	}
 	
 	@Override
+	public void onBackPressed()
+	{
+		this.setResult(((ParkingApplication)getApplication()).getResultUpdate());
+		super.onBackPressed();
+	}
+	
+	@Override
 	public void onDestroy()
 	{
 		locationManager.removeUpdates(locationListener);

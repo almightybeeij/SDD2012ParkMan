@@ -22,7 +22,8 @@ import android.app.Application;
 public class ParkingApplication extends Application {
 
 	private int resultCloseAll;
-
+	private int resultUpdate;
+	
 	public int getResultCloseAll() {		
 		return resultCloseAll;
 	}
@@ -31,6 +32,14 @@ public class ParkingApplication extends Application {
 		this.resultCloseAll = resultCloseAll;
 	}
 	
+	public int getResultUpdate() {
+		return resultUpdate;
+	}
+
+	public void setResultUpdate(int resultUpdate) {
+		this.resultUpdate = resultUpdate;
+	}
+
 	public boolean BooleanFromInt(int value) {
 		
 		return (value == 1 ? true : false);

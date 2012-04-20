@@ -37,6 +37,7 @@ public class LogInActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
         ((ParkingApplication)getApplication()).setResultCloseAll(0);
+        ((ParkingApplication)getApplication()).setResultUpdate(5);
     }
     
     public void logInOnClick(View view) {

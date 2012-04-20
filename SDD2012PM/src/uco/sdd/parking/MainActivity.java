@@ -57,27 +57,37 @@ public class MainActivity extends ListActivity {
         
         if (clientEmail != null) {
         	
-        	HTTPDataAccess dac = new HTTPDataAccess(this,
-        			getString(R.string.url_select), new CheckedInJSONArrayListener());
-        	
-        	dac.setStatement(getString(R.string.main_smt_checkedin));
-        	dac.setTypes(getString(R.string.main_smt_checkedin_types));
-        	dac.addNewBindVariable("email", clientEmail, false);
-        	dac.setUsingProgress(false);
-        	
-        	dac.executeSelect();
+        	selectCurrentStatus(clientEmail);
         }
     }
     
+	private void selectCurrentStatus(String email) {
+		
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new CheckedInJSONArrayListener());
+    	
+    	dac.setStatement(getString(R.string.main_smt_checkedin));
+    	dac.setTypes(getString(R.string.main_smt_checkedin_types));
+    	dac.addNewBindVariable("email", email, false);
+    	dac.setUsingProgress(false);
+    	
+    	dac.executeSelect();
+	}
+	
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	
     	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
+    	int update = ((ParkingApplication)getApplication()).getResultUpdate();
     	
         if (resultCode == closeAll) {
         	
         	setResult(closeAll);
         	finish();
+        }
+        else if (resultCode == update) {
+        	
+        	selectCurrentStatus(clientEmail);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -92,7 +102,7 @@ public class MainActivity extends ListActivity {
 
 			case 0:
 				i = new Intent(getApplicationContext(), ViewParkingMapActivity.class);
-				startActivity(i);
+				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultUpdate());
 				i = null;
 				break;
 			case 1:
