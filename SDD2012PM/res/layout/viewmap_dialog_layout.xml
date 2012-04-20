@@ -9,13 +9,33 @@
 	    android:layout_height="wrap_content" 
 	    android:id="@+id/viewmap_dlg_test"
 	    android:paddingTop="10sp"
-	    android:text="@string/viewparking_dlg_test"
-	    android:layout_marginBottom="15sp" />
+	    android:text="@string/viewparking_lbl_space"
+	    android:layout_marginLeft="2dp" />
+	
+	<Spinner android:id="@+id/viewparking_spn_space"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/viewparking_lbl_space"
+        android:clipChildren="false"
+        android:clipToPadding="true"
+        android:layout_marginBottom="15sp" />
+	
+	<Button android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/viewparking_btn_checkIn"
+	    android:id="@+id/viewparking_id_checkIn" />"
+	
+	<ImageView android:src="@android:drawable/divider_horizontal_dark"
+        android:contentDescription="@string/main_img_desc_divider"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:scaleType="fitXY"
+	    android:layout_marginTop="20dp"
+	    android:layout_marginBottom="20dp" />
 	
 	<Button android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:text="@string/viewparking_btn_getdirections"
-	    android:onClick="getDirectionsOnClick" 
 	    android:id="@+id/viewparking_id_getdirections" />"
 		
 </LinearLayout>

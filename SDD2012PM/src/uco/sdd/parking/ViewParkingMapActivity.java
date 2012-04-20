@@ -54,7 +54,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 public class ViewParkingMapActivity extends MapActivity {
 	
@@ -70,7 +69,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	private List<ParkingLot> facultyParkingLots;
 	private ParkingLot selectedLot;
 	private Projection projection;
-	private TextView tvDialog;
 	private Route directions;
 	private AlertDialog dialog;
 	private LocationManager locationManager;
@@ -176,19 +174,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	    	addFacultyParkingSpaces(lot);
 	    }
 	}
-	
-//	public void getDirectionsOnClick(View view)
-//	{
-//		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-//		
-//		if (lastKnownLocation != null)
-//		{
-//			selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
-//					"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
-//		}
-//		
-//		dialog.dismiss();
-//	}
 	
 	public void selectDirections(String origin, String destination)
 	{
@@ -379,15 +364,39 @@ public class ViewParkingMapActivity extends MapActivity {
 		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
 
 		dialog.setView(dialoglayout);
-		dialog.setTitle("Parking Lot " + Integer.toString(lot.getLotId()));
 		
-		tvDialog = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_test);
-		tvDialog.setText("Type: " + lot.getParkingType());
+		if (lot.isStudent()) {
+			dialog.setTitle("Student Lot " + Integer.toString(lot.getLotId()));
+		}
+		else {
+			dialog.setTitle("Faculty Lot " + Integer.toString(lot.getLotId()));
+		}
+			
+		Button btnCheckInOut = (Button)dialoglayout.findViewById(R.id.viewparking_id_checkIn);
+		btnCheckInOut.setOnClickListener(new CheckInOutOnClickListener());
 		
 		Button btnGetDirections = (Button)dialoglayout.findViewById(R.id.viewparking_id_getdirections);
 		btnGetDirections.setOnClickListener(new GetDirectionsOnClickListener());
 		
 		dialog.show();
+	}
+	
+	public class CheckInOutOnClickListener implements OnClickListener
+	{
+		public void onClick(View view)
+		{
+			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+			
+			if (lastKnownLocation != null)
+			{
+				//selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
+				
+				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+			}
+			
+			dialog.dismiss();
+		}
 	}
 	
 	public class GetDirectionsOnClickListener implements OnClickListener
@@ -967,7 +976,7 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		coordinatePair = json_data.getString("directionTo");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.setDirectionTo(coordinates[1] + "," + coordinates[0]);
-				    		
+				    		lot.setStudent(true);
 				    		lot.setParkingType("Student");
 				    	}
 	    				
@@ -1024,7 +1033,7 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		coordinatePair = json_data.getString("directionTo");
 				    		coordinates = coordinatePair.split(",");
 				    		lot.setDirectionTo(coordinates[1] + "," + coordinates[0]);
-				    		
+				    		lot.setFaculty(true);
 				    		lot.setParkingType("Faculty");
 				    	}
 	    				

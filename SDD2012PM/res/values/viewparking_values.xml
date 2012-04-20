@@ -10,8 +10,9 @@
         select * from parkingspace where parkinglot_lotid = ?
     </string>
     <string name="viewparking_smt_spacecoord_types">i</string>
-    <string name="viewparking_dlg_test">Test</string>
     <string name="viewparking_btn_satellite">Satellite View</string>
     <string name="viewparking_btn_street">Street View</string>
     <string name="viewparking_btn_getdirections">Get Directions</string>
+    <string name="viewparking_btn_checkIn">Check Into Space</string>
+    <string name="viewparking_lbl_space">Select Parking Space</string>
 </resources>
