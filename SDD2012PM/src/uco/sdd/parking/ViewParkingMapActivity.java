@@ -1,3 +1,20 @@
+/*
+ * ViewParkingMapActivity Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents the screen used to display the parking map.
+ * Coordinates are pulled from the database and the data
+ * is used to overlay parking lots and parking spaces
+ * onto the MapView. Also allows the user to check in or
+ * out of a parking space as well as get directions to a
+ * specific parking lot. 
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
