@@ -1,3 +1,19 @@
+/*
+ * MainActivity Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents the main menu screen for the parking management system.
+ * This screen is displayed immediately following the login screen, 
+ * after the user has successfully authenticated against the system.
+ * Contains menu options allowing the user access to the primary
+ * functions of the application.
+ */
+
 package uco.sdd.parking;
 
 import android.app.ListActivity;
@@ -8,8 +24,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MainActivity extends ListActivity
-{
+public class MainActivity extends ListActivity {
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -20,8 +36,9 @@ public class MainActivity extends ListActivity
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));
         
         Bundle extras = getIntent().getExtras();
-        if (extras != null)
-        {
+    
+        if (extras != null) {
+        	
         	String fName = extras.getString("firstName");
         	String lName = extras.getString("lastName");
         
@@ -35,8 +52,8 @@ public class MainActivity extends ListActivity
     	
     	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
     	
-        if (resultCode == closeAll)
-        {
+        if (resultCode == closeAll) {
+        	
         	setResult(closeAll);
         	finish();
         }

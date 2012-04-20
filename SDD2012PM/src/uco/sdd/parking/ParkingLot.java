@@ -1,3 +1,17 @@
+/*
+ * ParkingLot Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents a parking lot that is managed by the system.
+ * Holds data that is used to overlay a parking lot onto
+ * the ViewParkingMapActivity.
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
@@ -19,8 +33,8 @@ public class ParkingLot {
 	private ArrayList<ParkingSpace> parkingSpaces;
 	private Path lotPath;
 	
-	public ParkingLot()
-	{
+	public ParkingLot()	{
+		
 		coordinates = new ArrayList<GeoPoint>();
 		boundaries = new ArrayList<GeoPoint>();
 		parkingSpaces = new ArrayList<ParkingSpace>();
@@ -103,8 +117,8 @@ public class ParkingLot {
 		this.lotPath = lotPath;
 	}
 
-	public void addCoordinate(String latitude, String longitude)
-	{
+	public void addCoordinate(String latitude, String longitude) {
+		
 		double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
  
@@ -115,8 +129,8 @@ public class ParkingLot {
         coordinates.add(p);
 	}
 	
-	public void addBoundary(String latitude, String longitude)
-	{
+	public void addBoundary(String latitude, String longitude) {
+		
 		double lat = Double.parseDouble(latitude);
         double lng = Double.parseDouble(longitude);
  
@@ -161,8 +175,8 @@ public class ParkingLot {
 		return true;
 	}
 	
-	public void addBoundary(String coordinates)
-	{
+	public void addBoundary(String coordinates) {
+		
 		String[] coordinate;
 		coordinate = coordinates.split(",");
 		
@@ -176,8 +190,8 @@ public class ParkingLot {
         boundaries.add(p);
 	}
 	
-	public void clearPath()
-	{
+	public void clearPath()	{
+		
 		this.lotPath = new Path();
 	}
 }

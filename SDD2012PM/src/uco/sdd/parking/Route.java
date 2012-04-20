@@ -1,3 +1,16 @@
+/*
+ * Route Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents a route or set of directions returned by the
+ * Google Directions API.
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
@@ -18,8 +31,7 @@ public class Route {
 	
 	private ArrayList<RouteStep> steps;
 	
-	public Route()
-	{
+	public Route() {
 		steps = new ArrayList<RouteStep>();
 	}
 

@@ -1,5 +1,21 @@
+/*
+ * LogInActivity Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents the login screen for the parking management system.
+ * This screen is the first to be displayed when the application
+ * is started.  Accepts the user's e-mail account and password
+ * as input and allows or disallows the user entry to the remaining
+ * sections of the application.
+ */
+
 package uco.sdd.parking;
-//comment
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +49,7 @@ public class LogInActivity extends Activity {
     	String password = et_password.getText().toString();
     	
     	if ((email.trim().length() == 0) || (password.trim().length() == 0)) {
+    		
     		tv_test.setText(getString(R.string.login_msg_required));
     		return;
     	}
@@ -52,16 +69,16 @@ public class LogInActivity extends Activity {
     	
 	    public void onRemoteCallComplete(JSONArray jArray) {
 	    	
-	    	try
-	    	{	
+	    	try	{
+	    		
 	    		TextView tv_test = (TextView)findViewById(R.id.login_txt_error);
 	    		
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
-				    	for(int index = 0; index < jArray.length(); index++)
-				    	{	
+	    		if (jArray != null) {
+	    			
+	    			if (jArray.length() > 0) {
+	    				
+				    	for(int index = 0; index < jArray.length(); index++) {
+				    		
 				        	JSONObject json_data = jArray.getJSONObject(index);
 				        	
 				        	String firstName = json_data.getString("firstName");
@@ -81,8 +98,8 @@ public class LogInActivity extends Activity {
 		    			tv_test.setText(getString(R.string.login_msg_invalid));
 		    		}
 	    		}
-	    	}
-	    	catch (JSONException e)	{
+	    	} catch (JSONException e) {
+	    		
 	    		e.printStackTrace();
 	    	}
 	    }
@@ -95,8 +112,8 @@ public class LogInActivity extends Activity {
     	
     	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
     	
-        if (resultCode == closeAll)
-        {
+        if (resultCode == closeAll) {
+        	
         	setResult(closeAll);
         	finish();
         }

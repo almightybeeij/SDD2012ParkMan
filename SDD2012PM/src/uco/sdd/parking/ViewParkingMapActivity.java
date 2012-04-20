@@ -758,15 +758,15 @@ public class ViewParkingMapActivity extends MapActivity {
 		}
 	}
 	
-	public class ParkingLotFacultyOverlay extends Overlay
-	{
+	public class ParkingLotFacultyOverlay extends Overlay {
+		
 		private boolean isInitialized = false;
 		
 		private Paint fillPaint;
 		private Paint strokePaint;
 		
-		private void init()
-		{
+		private void init() {
+			
 			strokePaint = new Paint();
 			strokePaint.setAntiAlias(true);
             strokePaint.setColor(getResources().getColor(R.color.navy));
@@ -774,11 +774,6 @@ public class ViewParkingMapActivity extends MapActivity {
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
             strokePaint.setStrokeWidth(2);
-            
-            //final float scale = getResources().getDisplayMetrics().density;
-            //final float mGestureThreshold = (GESTURE_THRESHOLD_DIP * scale + 0.5f);
-            
-            //strokePaint.setTextSize(mGestureThreshold);
             strokePaint.setAlpha(100);
             
             fillPaint = new Paint();
@@ -795,10 +790,10 @@ public class ViewParkingMapActivity extends MapActivity {
     		
 			super.draw(canvas, mapv, shadow);
     		
-			if (shadow == false)
-			{
-	    		if (!isInitialized)
-	    		{
+			if (shadow == false) {
+				
+	    		if (!isInitialized)	{
+	    			
 	    			this.init();
 	    			this.isInitialized = true;
 	    		}
@@ -806,8 +801,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		Point coordInitial = new Point();
 	    		Point coordPoint = new Point();
 	    		
-	    		for (ParkingLot lot : facultyParkingLots)
-	    		{
+	    		for (ParkingLot lot : facultyParkingLots) {
+	    			
 	    			int count = 0;
 	    			
 	    			lot.clearPath();
@@ -816,14 +811,14 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			projection.toPixels(initial, coordInitial);
 	    			lotPath.moveTo(coordInitial.x, coordInitial.y);
 	    			
-	    			for (GeoPoint coordinate : lot.getCoordinates())
-	    			{
+	    			for (GeoPoint coordinate : lot.getCoordinates()) {
+	    				
 	    				count++;
 	    				
 	    				projection.toPixels(coordinate, coordPoint);
 	    				
-	    				if (count > 1)
-	    				{
+	    				if (count > 1) {
+	    					
 	    					lotPath.lineTo(coordPoint.x, coordPoint.y);
 	    				}
 	    			}
@@ -841,21 +836,21 @@ public class ViewParkingMapActivity extends MapActivity {
 		}
 		
 		@Override
-        public boolean onTouchEvent(MotionEvent event, MapView mapView) 
-        {   
-			if (event.getAction() == 1)
-            {      
-            	for (ParkingLot lot : facultyParkingLots)
-            	{
+        public boolean onTouchEvent(MotionEvent event, MapView mapView) {
+			
+			if (event.getAction() == 1) {
+				
+            	for (ParkingLot lot : facultyParkingLots) {
+            		
             		Path lotPath = lot.getLotPath();
             		
-	            	if (lotPath != null)
-	            	{
+	            	if (lotPath != null) {
+	            		
 	            		RectF lotRect = new RectF();
 	            		lotPath.computeBounds(lotRect, false);
 	                    
-	            		if (lotRect.contains(event.getX(), event.getY()))
-	            		{
+	            		if (lotRect.contains(event.getX(), event.getY())) {
+	            			
 	            			showParkingLotDialog(lot);
 	            			break;
 	            		}                    
@@ -874,14 +869,14 @@ public class ViewParkingMapActivity extends MapActivity {
 	    private GeoPoint gp2;
 	    private Paint strokePaint;
 	    
-	    public DirectionPathOverlay(GeoPoint gp1, GeoPoint gp2)
-	    {
+	    public DirectionPathOverlay(GeoPoint gp1, GeoPoint gp2) {
+	    	
 	        this.gp1 = gp1;
 	        this.gp2 = gp2;
 	    }
 
-	    private void init()
-		{
+	    private void init() {
+	    	
 			strokePaint = new Paint();
 			strokePaint.setAntiAlias(true);
             strokePaint.setColor(getResources().getColor(R.color.brightblue));
@@ -896,8 +891,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	        
 	        if (shadow == false) {
 	        	
-	        	if (!isInitialized)
-	    		{
+	        	if (!isInitialized)	{
+	        		
 	    			this.init();
 	    			this.isInitialized = true;
 	    		}
@@ -922,8 +917,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    }
 	}
 	
-	private class StudentLotCoordinatesJSONListener implements GetJSONListener
-	{
+	private class StudentLotCoordinatesJSONListener implements GetJSONListener {
+		
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    	
 			int lotId = 0;
@@ -931,16 +926,16 @@ public class ViewParkingMapActivity extends MapActivity {
 			String[] coordinates;
 			ParkingLot lot;
 			
-	    	try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
+	    	try	{
+	    		
+	    		if (jArray != null)	{
+	    			
+	    			if (jArray.length() > 0) {
+	    				
 	    				lot = new ParkingLot();
 	    				
-	    				for(int index = 0; index < jArray.length(); index++)
-				    	{
+	    				for(int index = 0; index < jArray.length(); index++) {
+	    					
 				    		JSONObject json_data = jArray.getJSONObject(index);
 				    		
 				    		if (index == 0) lotId = json_data.getInt("lotid");
@@ -971,6 +966,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 	    	}
 	    	catch (JSONException e)	{
+	    		
 	    		e.printStackTrace();
 	    	}
 		}
@@ -978,8 +974,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	 
-	private class FacultyLotCoordinatesJSONListener implements GetJSONListener
-	{
+	private class FacultyLotCoordinatesJSONListener implements GetJSONListener {
+		
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    	
 			int lotId = 0;
@@ -987,16 +983,16 @@ public class ViewParkingMapActivity extends MapActivity {
 			String[] coordinates;
 			ParkingLot lot;
 			
-	    	try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
+	    	try {
+	    		
+	    		if (jArray != null) {
+	    			
+	    			if (jArray.length() > 0) {
+	    				
 	    				lot = new ParkingLot();
 	    				
-	    				for(int index = 0; index < jArray.length(); index++)
-				    	{
+	    				for(int index = 0; index < jArray.length(); index++) {
+	    					
 				    		JSONObject json_data = jArray.getJSONObject(index);
 				    		
 				    		if (index == 0) lotId = json_data.getInt("lotid");
@@ -1027,6 +1023,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 	    	}
 	    	catch (JSONException e)	{
+	    		
 	    		e.printStackTrace();
 	    	}
 		}
@@ -1034,8 +1031,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
-	private class StudentSpacesJSONListener implements GetJSONListener
-	{
+	private class StudentSpacesJSONListener implements GetJSONListener {
+		
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    
 			ParkingLot lotLookFor;
@@ -1043,12 +1040,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			ParkingSpace space;
 			JSONObject json_data;
 			
-			try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
+			try	{
+				
+	    		if (jArray != null) {
+	    			
+	    			if (jArray.length() > 0) {
+	    				
 	    				lotLookFor = new ParkingLot();
 	    				lotMatch = new ParkingLot();
 	    				
@@ -1059,12 +1056,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			    		
 			    		int match = studentParkingLots.indexOf(lotLookFor);
 			    		
-			    		if (match != -1)
-			    		{
+			    		if (match != -1) {
+			    			
 			    			lotMatch = studentParkingLots.get(match);
 			    			
-			    			for(int index = 0; index < jArray.length(); index++)
-					    	{
+			    			for(int index = 0; index < jArray.length(); index++) {
+			    				
 					    		json_data = jArray.getJSONObject(index);
 					    		
 					    		space = new ParkingSpace();
@@ -1088,6 +1085,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 	    	}
 	    	catch (JSONException e)	{
+	    		
 	    		e.printStackTrace();
 	    	}
 		}
@@ -1095,8 +1093,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
-	private class FacultySpacesJSONListener implements GetJSONListener
-	{
+	private class FacultySpacesJSONListener implements GetJSONListener {
+		
 		public void onRemoteCallComplete(JSONArray jArray) {
 			    
 			ParkingLot lotLookFor;
@@ -1104,12 +1102,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			ParkingSpace space;
 			JSONObject json_data;
 			
-			try
-	    	{
-	    		if (jArray != null)
-	    		{
-	    			if (jArray.length() > 0)
-	    			{
+			try	{
+				
+	    		if (jArray != null)	{
+	    			
+	    			if (jArray.length() > 0) {
+	    				
 	    				lotLookFor = new ParkingLot();
 	    				lotMatch = new ParkingLot();
 	    				
@@ -1120,12 +1118,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			    		
 			    		int match = facultyParkingLots.indexOf(lotLookFor);
 			    		
-			    		if (match != -1)
-			    		{
+			    		if (match != -1) {
+			    			
 			    			lotMatch = facultyParkingLots.get(match);
 			    			
-			    			for(int index = 0; index < jArray.length(); index++)
-					    	{
+			    			for(int index = 0; index < jArray.length(); index++) {
+			    				
 					    		json_data = jArray.getJSONObject(index);
 					    		
 					    		space = new ParkingSpace();
@@ -1149,6 +1147,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 	    	}
 	    	catch (JSONException e)	{
+	    		
 	    		e.printStackTrace();
 	    	}
 		}
@@ -1156,8 +1155,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		public void onRemoteCallComplete(JSONObject jObject) {}
 	}
 	
-	private class GetDirectionsJSONListener implements GetJSONListener
-	{
+	private class GetDirectionsJSONListener implements GetJSONListener {
+		
 		public void onRemoteCallComplete(JSONArray jArray) {}
 		
 		public void onRemoteCallComplete(JSONObject jObject) {
@@ -1176,12 +1175,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			JSONObject jStep;
 			JSONObject jBounds;
 			
-			try
-	    	{
-	    		if (jObject != null)
-	    		{
-	    			if (jObject.length() > 0)
-	    			{
+			try {
+				
+	    		if (jObject != null) {
+	    			
+	    			if (jObject.length() > 0) {
+	    				
 	    				jArray = jObject.getJSONArray("routes");
 	    				jRoute = jArray.getJSONObject(0);
 	    				
@@ -1211,8 +1210,8 @@ public class ViewParkingMapActivity extends MapActivity {
 			            lng = Double.parseDouble(jLeg.getJSONObject("end_location").getString("lng"));
 			    		directions.setEndLocation(new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)));
 			    		
-			    		for(int index = 0; index < jSteps.length(); index++)
-				    	{
+			    		for(int index = 0; index < jSteps.length(); index++) {
+			    			
 			    			polyLine = "";
 				    		jStep = jSteps.getJSONObject(index);
 				    		
@@ -1241,6 +1240,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    		}
 	    	}
 	    	catch (JSONException e)	{
+	    		
 	    		e.printStackTrace();
 	    	}
 		}
@@ -1261,8 +1261,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	        int shift = 0;
 	        int result = 0;
 	        
-	        do
-	        {
+	        do {
 	            b = encoded.charAt(index++) - 63;
 	            result |= (b & 0x1f) << shift;
 	            shift += 5;
@@ -1273,12 +1272,12 @@ public class ViewParkingMapActivity extends MapActivity {
 	        shift = 0;
 	        result = 0;
 	        
-	        do
-	        {
+	        do {
 	            b = encoded.charAt(index++) - 63;
 	            result |= (b & 0x1f) << shift;
 	            shift += 5;
 	        } while (b >= 0x20);
+	        
 	        int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
 	        lng += dlng;
 
@@ -1291,12 +1290,9 @@ public class ViewParkingMapActivity extends MapActivity {
 	    return poly;
 	}
 	
-	public class MyLocationListener implements LocationListener
-	{    
-		public void onLocationChanged(Location location)
-	    {
-	      // Make use of new location
-	    }
+	public class MyLocationListener implements LocationListener	{
+		
+		public void onLocationChanged(Location location) {}
 
 	    public void onStatusChanged(String provider, int status, Bundle extras) {}
 
@@ -1305,11 +1301,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    public void onProviderDisabled(String provider) {}
 	}
 	  
-	private boolean BooleanFromInt(int value)
-	{
-		if (value == 1)
-			return true;
-		else
-			return false;
+	private boolean BooleanFromInt(int value) {
+		
+		return (value == 1 ? true : false);
 	}
 }

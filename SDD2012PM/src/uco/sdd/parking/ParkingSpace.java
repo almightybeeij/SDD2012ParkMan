@@ -1,3 +1,17 @@
+/*
+ * ParkingSpace Class
+ * 
+ * Version 1.0.0
+ * 
+ * Author: Cory Wilson
+ * Last Updated: 04/19/2012
+ * Last Updated By: Cory Wilson
+ * 
+ * Represents a parking space that is managed by the system.
+ * Holds data that is used to overlay a parking space onto
+ * the ViewParkingMapActivity.
+ */
+
 package uco.sdd.parking;
 
 import java.util.ArrayList;
@@ -13,8 +27,8 @@ public class ParkingSpace {
 	
 	private ArrayList<GeoPoint> corners;
 
-	public ParkingSpace()
-	{
+	public ParkingSpace() {
+		
 		spaceId = 0;
 		isAvailable = false;
 		isHandicap = false;
@@ -63,8 +77,8 @@ public class ParkingSpace {
 		this.corners = corners;
 	}
 	
-	public void addCorner(String coordinates)
-	{
+	public void addCorner(String coordinates) {
+		
 		String[] coordinate;
 		coordinate = coordinates.split(",");
 		
