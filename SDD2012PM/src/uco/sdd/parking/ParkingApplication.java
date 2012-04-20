@@ -30,4 +30,9 @@ public class ParkingApplication extends Application {
 	public void setResultCloseAll(int resultCloseAll) {		
 		this.resultCloseAll = resultCloseAll;
 	}
+	
+	public boolean BooleanFromInt(int value) {
+		
+		return (value == 1 ? true : false);
+	}
 }

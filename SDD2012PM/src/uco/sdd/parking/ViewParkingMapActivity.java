@@ -53,7 +53,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 public class ViewParkingMapActivity extends MapActivity {
 	
@@ -67,6 +69,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	private List<Overlay> mapOverlays;
 	private List<ParkingLot> studentParkingLots;
 	private List<ParkingLot> facultyParkingLots;
+	private ArrayList<String> parkingSpaces;
 	private ParkingLot selectedLot;
 	private Projection projection;
 	private Route directions;
@@ -359,6 +362,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	public void showParkingLotDialog(ParkingLot lot)
 	{
 		selectedLot = lot;
+		parkingSpaces = new ArrayList<String>();
 		
 		LayoutInflater inflater = getLayoutInflater();		
 		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
@@ -372,6 +376,17 @@ public class ViewParkingMapActivity extends MapActivity {
 			dialog.setTitle("Faculty Lot " + Integer.toString(lot.getLotId()));
 		}
 			
+		for (ParkingSpace space : lot.getParkingSpaces())
+		{
+			parkingSpaces.add(Integer.toString(space.getSpaceId()));
+		}
+		
+		ArrayAdapter<String> adapterSpaces = new ArrayAdapter<String>(getApplicationContext(),
+	    		R.layout.viewmap_spinner_item, R.id.viewparking_spn_itemtext, parkingSpaces);
+		
+		Spinner spinnerParkingSpaces = (Spinner)dialoglayout.findViewById(R.id.viewparking_spn_space);
+    	spinnerParkingSpaces.setAdapter(adapterSpaces);
+		
 		Button btnCheckInOut = (Button)dialoglayout.findViewById(R.id.viewparking_id_checkIn);
 		btnCheckInOut.setOnClickListener(new CheckInOutOnClickListener());
 		
@@ -389,8 +404,6 @@ public class ViewParkingMapActivity extends MapActivity {
 			
 			if (lastKnownLocation != null)
 			{
-				//selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
-				
 				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
 						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
 			}

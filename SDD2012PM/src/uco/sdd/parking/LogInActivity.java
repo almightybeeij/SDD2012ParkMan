@@ -81,10 +81,12 @@ public class LogInActivity extends Activity {
 				    		
 				        	JSONObject json_data = jArray.getJSONObject(index);
 				        	
+				        	String email = json_data.getString("email");
 				        	String firstName = json_data.getString("firstName");
 				        	String lastName = json_data.getString("lastName");
 				        	
 				        	Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				        	i.putExtra("email", email);
 				        	i.putExtra("firstName", firstName);
 					    	i.putExtra("lastName", lastName);
 					    	

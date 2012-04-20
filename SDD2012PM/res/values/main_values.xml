@@ -8,4 +8,10 @@
         <item>Search for Parking</item>
         <item>Quit</item>
     </string-array>
+    <string name="main_smt_checkedin">
+        select spaceid, parkinglot_lotid, studentlot, facultylot
+        from parkingspace, parkinglot where client_email = ? and
+        parkinglot_lotid = lotid
+    </string>
+    <string name="main_smt_checkedin_types">s</string>
 </resources>

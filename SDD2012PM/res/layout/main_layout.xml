@@ -26,4 +26,19 @@
 	    android:layout_weight="1"
 	    android:headerDividersEnabled="true" />
 
+    <ImageView android:src="@android:drawable/divider_horizontal_dark"
+        android:contentDescription="@string/main_img_desc_divider"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:scaleType="fitXY" />
+    
+    <TextView android:id="@+id/main_tvw_checkedIn"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
+        android:paddingLeft="10sp"
+        android:textColor="@color/uco_yellow"
+        android:gravity="center_vertical|center_horizontal" />
+        
 </LinearLayout>
