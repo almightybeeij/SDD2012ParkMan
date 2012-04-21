@@ -31,6 +31,7 @@ public class SearchResultsActivity extends ListActivity {
 
 	private String lotId;
 	private ArrayList<String> parkingSpaces;
+	private ArrayList<String> parkingSpacesList;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class SearchResultsActivity extends ListActivity {
 	    setContentView(R.layout.searchresults_layout);
 	    
 	    parkingSpaces = new ArrayList<String>();
+	    parkingSpacesList = new ArrayList<String>();
 	    
 	    Set<String> keys = getIntent().getExtras().keySet();
 	    Bundle extras = getIntent().getExtras();
@@ -52,12 +54,13 @@ public class SearchResultsActivity extends ListActivity {
 	    		lotId = extras.getString(key);
 	    	}
 	    	else {
+	    		parkingSpacesList.add("Space " + extras.getString(key));
 	    		parkingSpaces.add(extras.getString(key));
 	    	}
 	    }
 	    
 	    setListAdapter(new ArrayAdapter<String>(this, R.layout.searchresults_list_item,
-	    	R.id.searchresults_parkingspace, parkingSpaces));
+	    	R.id.searchresults_parkingspace, parkingSpacesList));
 	}
 
 	@Override
@@ -68,12 +71,23 @@ public class SearchResultsActivity extends ListActivity {
 				
 		LinearLayout spaceLayout = (LinearLayout)v;
 		TextView tvSpace = (TextView)spaceLayout.findViewById(R.id.searchresults_parkingspace);
+		
 		String space = tvSpace.getText().toString();
 		String[] spaceElements = space.split(" ");
 		
 		i = new Intent(getApplicationContext(), ViewParkingMapActivity.class);
 		i.putExtra("lotId", lotId);
 		i.putExtra("spaceId", spaceElements[1]);
+		
+		int count = 0;
+		for (String spaceId : parkingSpaces) {
+			
+			if (!spaceId.equals(spaceElements[1])) {
+				
+				count++;
+				i.putExtra("space" + count, spaceId);
+			}
+		}
 		
 		startActivity(i);
 		i = null;

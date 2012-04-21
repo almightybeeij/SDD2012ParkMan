@@ -70,6 +70,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	private List<ParkingLot> studentParkingLots;
 	private List<ParkingLot> facultyParkingLots;
 	private ArrayList<String> parkingSpaces;
+	private ArrayList<String> viewSpaces;
 	private ParkingLot selectedLot;
 	private Projection projection;
 	private Route directions;
@@ -89,6 +90,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.viewmap_layout);
 	    
+	    viewSpace = false;
 	    Criteria criteria = new Criteria();
 	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
 	    
@@ -99,6 +101,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    
 	    studentParkingLots = new ArrayList<ParkingLot>();
 	    facultyParkingLots = new ArrayList<ParkingLot>();
+	    viewSpaces = new ArrayList<String>();
+	    
 	    directions = new Route();
 	    dialog = new AlertDialog.Builder(this).create();
 	    
@@ -129,6 +133,10 @@ public class ViewParkingMapActivity extends MapActivity {
         	viewSpace = true;
         	viewSpaceId = extras.getString("spaceId");
         	viewLotId = extras.getString("lotId");
+        	viewSpaces.add(extras.getString("space1"));
+        	viewSpaces.add(extras.getString("space2"));
+        	viewSpaces.add(extras.getString("space3"));
+        	viewSpaces.add(extras.getString("space4"));
         }
         
         selectParkingLotCoordinates(true, false);
@@ -136,21 +144,21 @@ public class ViewParkingMapActivity extends MapActivity {
 	}
 	
 	@Override
-	public void onBackPressed()
-	{
+	public void onBackPressed()	{
+		
 		this.setResult(((ParkingApplication)getApplication()).getResultUpdate());
 		super.onBackPressed();
 	}
 	
 	@Override
-	public void onDestroy()
-	{
+	public void onDestroy() {
+		
 		locationManager.removeUpdates(locationListener);
 		super.onDestroy();
 	}
 	
-	public void mapButtonOnClick(View view)
-	{
+	public void mapButtonOnClick(View view)	{
+		
 		switch(view.getId())
 		{
 			case R.id.viewparking_btn_sat:
@@ -167,8 +175,8 @@ public class ViewParkingMapActivity extends MapActivity {
 		}
 	}
 	
-	public void resetOverlays()
-	{
+	public void resetOverlays()	{
+		
 		mapOverlays.clear();
 		
 		mapOverlays.add(new ParkingLotStudentOverlay());
@@ -183,6 +191,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    {
 	    	addFacultyParkingSpaces(lot);
 	    }
+	    
+	    mapView.invalidate();
 	}
 	
 	public void selectDirections(String origin, String destination)
@@ -250,7 +260,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		if (viewLotId != null)
 			matchLotId = Integer.parseInt(viewLotId);
 		
-		if (viewSpace && lot.getLotId() == matchLotId)
+		if (lot.getLotId() == matchLotId)
 		{
 			int matchId = Integer.parseInt(viewSpaceId);
 						
@@ -285,7 +295,7 @@ public class ViewParkingMapActivity extends MapActivity {
 		if (viewLotId != null)
 			matchLotId = Integer.parseInt(viewLotId);
 		
-		if (viewSpace && lot.getLotId() == matchLotId)
+		if (lot.getLotId() == matchLotId)
 		{
 			int matchId = Integer.parseInt(viewSpaceId);
 						
@@ -383,19 +393,38 @@ public class ViewParkingMapActivity extends MapActivity {
 			dialog.setTitle("Faculty Lot " + Integer.toString(lot.getLotId()));
 		}
 			
-		for (ParkingSpace space : lot.getParkingSpaces())
-		{
-			parkingSpaces.add(Integer.toString(space.getSpaceId()));
+		if (!viewSpace) {
+			
+			int count = 0;
+			for (ParkingSpace space : lot.getParkingSpaces()) {
+				
+				if (count <= 10) {
+				
+					parkingSpaces.add(Integer.toString(space.getSpaceId()));
+				}
+				count++;
+			}
 		}
-		
+		else {
+			
+			parkingSpaces.add(viewSpaceId);
+			for (String spaceId : viewSpaces)
+			{
+				parkingSpaces.add(spaceId);
+			}
+		}
+			
 		ArrayAdapter<String> adapterSpaces = new ArrayAdapter<String>(getApplicationContext(),
 	    		R.layout.viewmap_spinner_item, R.id.viewparking_spn_itemtext, parkingSpaces);
-		
+	
 		Spinner spinnerParkingSpaces = (Spinner)dialoglayout.findViewById(R.id.viewparking_spn_space);
     	spinnerParkingSpaces.setAdapter(adapterSpaces);
-		
-		Button btnCheckInOut = (Button)dialoglayout.findViewById(R.id.viewparking_id_checkIn);
+				
+		Button btnCheckInOut = (Button)dialoglayout.findViewById(R.id.viewparking_id_checkin);
 		btnCheckInOut.setOnClickListener(new CheckInOutOnClickListener());
+		
+		Button btnViewInMap = (Button)dialoglayout.findViewById(R.id.viewparking_id_viewspace);
+		btnViewInMap.setOnClickListener(new ViewInMapOnClickListener());
 		
 		Button btnGetDirections = (Button)dialoglayout.findViewById(R.id.viewparking_id_getdirections);
 		btnGetDirections.setOnClickListener(new GetDirectionsOnClickListener());
@@ -407,6 +436,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	{
 		public void onClick(View view)
 		{
+			dialog.getLayoutInflater().inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
+			
 			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 			
 			if (lastKnownLocation != null)
@@ -415,6 +446,21 @@ public class ViewParkingMapActivity extends MapActivity {
 						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
 			}
 			
+			dialog.dismiss();
+		}
+	}
+	
+	public class ViewInMapOnClickListener implements OnClickListener
+	{
+		public void onClick(View view)
+		{
+			Spinner spinnerParkingSpaces = (Spinner)dialog.findViewById(R.id.viewparking_spn_space);
+			
+			String selectedSpaceId = (String)spinnerParkingSpaces.getSelectedItem();
+			viewSpaceId = selectedSpaceId;
+			viewLotId = Integer.toString(selectedLot.getLotId());
+			
+			resetOverlays();
 			dialog.dismiss();
 		}
 	}
@@ -978,6 +1024,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			
 	    			if (jArray.length() > 0) {
 	    				
+	    				studentParkingLots = new ArrayList<ParkingLot>();
 	    				lot = new ParkingLot();
 	    				
 	    				for(int index = 0; index < jArray.length(); index++) {
@@ -1035,6 +1082,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    			
 	    			if (jArray.length() > 0) {
 	    				
+	    				facultyParkingLots = new ArrayList<ParkingLot>();
 	    				lot = new ParkingLot();
 	    				
 	    				for(int index = 0; index < jArray.length(); index++) {

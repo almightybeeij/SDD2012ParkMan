@@ -13,13 +13,6 @@
         android:background="@color/uco_blue"
         android:textColor="@color/uco_yellow" />"
     
-    <ImageView android:src="@android:drawable/divider_horizontal_dark"
-        android:contentDescription="@string/main_img_desc_divider"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:scaleType="fitXY"
-	    android:paddingTop="2dp" />
-    
     <ListView android:id="@android:id/list"
 	    android:layout_width="fill_parent"
 	    android:layout_height="0dp"

@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SearchActivity extends Activity {
 
@@ -257,11 +258,15 @@ public class SearchActivity extends Activity {
 	    				for(int index = 0; index < jArray.length(); index++) {
 	    					
 				    		JSONObject json_data = jArray.getJSONObject(index);
-				    		i.putExtra("Space" + (index + 1), "Space " + json_data.getString("spaceId"));
+				    		i.putExtra("Space" + (index + 1), json_data.getString("spaceId"));
 				    	}
 				    	
 	    				startActivity(i);
 	    				i = null;
+	    			}
+	    			else {
+	    				
+	    				setErrorMessage("No results found. Please try again.");
 	    			}
 	    		}
 	    	} catch (JSONException e) {
@@ -279,6 +284,7 @@ public class SearchActivity extends Activity {
 	        View view, int pos, long id) {
 	    	
 	    	String buildingValue = parent.getItemAtPosition(pos).toString();
+	    	setErrorMessage("");
 	    	
 	    	if (buildingValue.trim() != "")	{
 	    		
@@ -301,6 +307,7 @@ public class SearchActivity extends Activity {
 	    	View view, int pos, long id) {
 	    	
 	    	String parkingTypeValue = parent.getItemAtPosition(pos).toString();
+	    	setErrorMessage("");
 	    	
 	    	if (parkingTypeValue.trim() != "") {
 	    		
@@ -324,6 +331,7 @@ public class SearchActivity extends Activity {
 	    	View view, int pos, long id) {
 	    	
 	    	String parkingLotValue = parent.getItemAtPosition(pos).toString();
+	    	setErrorMessage("");
 	    	
 	    	if (parkingLotValue.trim() != "") {
 	    		
@@ -333,5 +341,11 @@ public class SearchActivity extends Activity {
 	    }
 
 	    public void onNothingSelected(AdapterView<?> parent) {}
+	}
+	
+	private void setErrorMessage(String message)
+	{
+		TextView tvError = (TextView)findViewById(R.id.search_txt_error);
+		tvError.setText(message);
 	}
 }

@@ -20,10 +20,21 @@
         android:clipToPadding="true"
         android:layout_marginBottom="15sp" />
 	
-	<Button android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:text="@string/viewparking_btn_checkIn"
-	    android:id="@+id/viewparking_id_checkIn" />"
+	<LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    
+	    <Button android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/viewparking_btn_checkin"
+		    android:id="@+id/viewparking_id_checkin" />"
+	   	
+	   	<Button android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/viewparking_btn_viewspace"
+		    android:id="@+id/viewparking_id_viewspace" />"
+   	
+	</LinearLayout>	
 	
 	<ImageView android:src="@android:drawable/divider_horizontal_dark"
         android:contentDescription="@string/main_img_desc_divider"
