@@ -56,13 +56,23 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class ViewParkingMapActivity extends MapActivity {
+	
+	private boolean viewSpace;
+	private boolean checkedIn;
 	
 	private String locationProvider;
 	private String viewSpaceId;
 	private String viewLotId;
-	private boolean viewSpace;
+	private String checkedInLotId;
+	private String checkedInSpaceId;
+	private String checkedInType;
+	private String clientEmail;
+	private String tempLotId;
+	private String tempSpaceId;
+	private String tempType;
 	
 	private MapView mapView;
 	private MapController mc;
@@ -91,6 +101,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    setContentView(R.layout.viewmap_layout);
 	    
 	    viewSpace = false;
+	    checkedIn = false;
 	    Criteria criteria = new Criteria();
 	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
 	    
@@ -141,6 +152,9 @@ public class ViewParkingMapActivity extends MapActivity {
         
         selectParkingLotCoordinates(true, false);
         selectParkingLotCoordinates(false, true);
+        
+        clientEmail = ((ParkingApplication)getApplication()).getUserEmail();
+        selectCurrentStatus(clientEmail);
 	}
 	
 	@Override
@@ -255,6 +269,9 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	public void addStudentParkingSpaces(ParkingLot lot)
 	{
+		int spaceId = 0;
+		int currentSpaceId = 0;
+		int currentSpaceLot = 0;
 		int matchLotId = -1;
 		
 		if (viewLotId != null)
@@ -263,33 +280,116 @@ public class ViewParkingMapActivity extends MapActivity {
 		if (lot.getLotId() == matchLotId)
 		{
 			int matchId = Integer.parseInt(viewSpaceId);
-						
-			for (ParkingSpace space : lot.getParkingSpaces())
-			{
-				if (space.getSpaceId() != matchId)
+				
+			if (!checkedIn) {
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
 				{
-					mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
-				}
-				else
-				{
-					mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+					spaceId = space.getSpaceId();
+					
+					if (spaceId != matchId)
+					{
+						mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+					}
+					else
+					{
+						mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
 							space.getCorners().get(2), space.getCorners().get(3)));
+					}
+				}
+			}
+			else {
+				
+				currentSpaceId = Integer.parseInt(checkedInSpaceId);
+				currentSpaceLot = Integer.parseInt(checkedInLotId);
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					spaceId = space.getSpaceId();
+					
+					if (spaceId != matchId)
+					{
+						if (spaceId != currentSpaceId) {
+							
+							mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+						}
+						else {
+							
+							if (currentSpaceLot == lot.getLotId()) {
+								
+								mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+									space.getCorners().get(2), space.getCorners().get(3)));
+							}
+							else {
+								
+								mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+									space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+							}
+						}
+					}
+					else
+					{
+						if (spaceId != currentSpaceId) {
+							
+							mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3)));
+						}
+						else {
+							mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+									space.getCorners().get(2), space.getCorners().get(3)));
+						}
+							
+					}
 				}
 			}
 		}
 		else
 		{
-			for (ParkingSpace space : lot.getParkingSpaces())
-			{
-				mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+			if (!checkedIn) {
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+				}
+			}
+			else {
+				
+				currentSpaceId = Integer.parseInt(checkedInSpaceId);
+				currentSpaceLot = Integer.parseInt(checkedInLotId);
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					if (space.getSpaceId() != currentSpaceId) {
+						
+						mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+					}
+					else {
+						
+						if (currentSpaceLot == lot.getLotId()) {
+							
+							mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3)));
+						}
+						else {
+							
+							mapOverlays.add(new StudentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+						}
+					}
+				}
 			}
 		}
 	}
 	
 	public void addFacultyParkingSpaces(ParkingLot lot)
 	{
+		int spaceId = 0;
+		int currentSpaceId = 0;
+		int currentSpaceLot = 0;
 		int matchLotId = -1;
 		
 		if (viewLotId != null)
@@ -298,27 +398,107 @@ public class ViewParkingMapActivity extends MapActivity {
 		if (lot.getLotId() == matchLotId)
 		{
 			int matchId = Integer.parseInt(viewSpaceId);
-						
-			for (ParkingSpace space : lot.getParkingSpaces())
-			{
-				if (space.getSpaceId() != matchId)
+				
+			if (!checkedIn) {
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
 				{
-					mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
-				}
-				else
-				{
-					mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+					spaceId = space.getSpaceId();
+					
+					if (spaceId != matchId)
+					{
+						mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+					}
+					else
+					{
+						mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
 							space.getCorners().get(2), space.getCorners().get(3)));
+					}
+				}
+			}
+			else {
+				
+				currentSpaceId = Integer.parseInt(checkedInSpaceId);
+				currentSpaceLot = Integer.parseInt(checkedInLotId);
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					spaceId = space.getSpaceId();
+					
+					if (spaceId != matchId)
+					{
+						if (spaceId != currentSpaceId) {
+							
+							mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+						}
+						else {
+							
+							if (currentSpaceLot == lot.getLotId()) {
+								
+								mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+										space.getCorners().get(2), space.getCorners().get(3)));
+							}
+							else {
+								
+								mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+										space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+							}
+						}
+					}
+					else
+					{
+						if (spaceId != currentSpaceId) {
+							
+							mapOverlays.add(new ViewParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3)));
+						}
+						else {
+							mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+									space.getCorners().get(2), space.getCorners().get(3)));
+						}
+							
+					}
 				}
 			}
 		}
 		else
 		{
-			for (ParkingSpace space : lot.getParkingSpaces())
-			{
-				mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
-						space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+			if (!checkedIn) {
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+				}
+			}
+			else {
+				
+				currentSpaceId = Integer.parseInt(checkedInSpaceId);
+				currentSpaceLot = Integer.parseInt(checkedInLotId);
+				
+				for (ParkingSpace space : lot.getParkingSpaces())
+				{
+					if (space.getSpaceId() != currentSpaceId) {
+						
+						mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+							space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+					}
+					else {
+						
+						if (currentSpaceLot == lot.getLotId()) {
+							
+							mapOverlays.add(new CurrentParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3)));
+						}
+						else {
+							
+							mapOverlays.add(new FacultyParkingSpaceOverlay(space.getCorners().get(0), space.getCorners().get(1),
+								space.getCorners().get(2), space.getCorners().get(3), space.isAvailable()));
+						}
+					}
+				}
 			}
 		}
 	}
@@ -376,6 +556,41 @@ public class ViewParkingMapActivity extends MapActivity {
     	dac.executeSelect();
 	}
 	
+	public void selectCurrentStatus(String email) {
+		
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new CheckedInJSONArrayListener());
+    	
+    	dac.setStatement(getString(R.string.main_smt_checkedin));
+    	dac.setTypes(getString(R.string.main_smt_checkedin_types));
+    	dac.addNewBindVariable("email", email, false);
+    	dac.setUsingProgress(false);
+    	
+    	dac.executeSelect();
+	}
+
+	public void updateCurrentStatus(String email, String available, String spaceId, String lotId)
+	{
+		HTTPDataAccess dac = new HTTPDataAccess(this,
+    			getString(R.string.url_select), new UpdateStatusJSONArrayListener());
+    	
+    	if (email != "") {
+    		dac.setStatement(getString(R.string.viewparking_smt_checkin));
+        	dac.setTypes(getString(R.string.viewparking_smt_checkin_types));
+    		dac.addNewBindVariable("email", email, false);
+    	}
+    	else {
+    		dac.setStatement(getString(R.string.viewparking_smt_checkout));
+        	dac.setTypes(getString(R.string.viewparking_smt_checkout_types));
+    	}
+    	
+    	dac.addNewBindVariable("available", available, false);
+    	dac.addNewBindVariable("spaceId", spaceId, false);
+    	dac.addNewBindVariable("lotId", lotId, false);
+    	
+    	dac.executeSelect();
+	}
+	
 	public void showParkingLotDialog(ParkingLot lot)
 	{
 		selectedLot = lot;
@@ -392,26 +607,33 @@ public class ViewParkingMapActivity extends MapActivity {
 		else {
 			dialog.setTitle("Faculty Lot " + Integer.toString(lot.getLotId()));
 		}
+		
+		if (!checkedIn)	{
 			
-		if (!viewSpace) {
-			
-			int count = 0;
-			for (ParkingSpace space : lot.getParkingSpaces()) {
+			if (!viewSpace) {
 				
-				if (count <= 10) {
-				
-					parkingSpaces.add(Integer.toString(space.getSpaceId()));
+				int count = 0;
+				for (ParkingSpace space : lot.getParkingSpaces()) {
+					
+					if (count <= 10 && space.isAvailable()) {
+					
+						parkingSpaces.add(Integer.toString(space.getSpaceId()));
+					}
+					count++;
 				}
-				count++;
+			}
+			else {
+				
+				parkingSpaces.add(viewSpaceId);
+				for (String spaceId : viewSpaces)
+				{
+					parkingSpaces.add(spaceId);
+				}
 			}
 		}
 		else {
 			
-			parkingSpaces.add(viewSpaceId);
-			for (String spaceId : viewSpaces)
-			{
-				parkingSpaces.add(spaceId);
-			}
+			parkingSpaces.add(checkedInSpaceId);
 		}
 			
 		ArrayAdapter<String> adapterSpaces = new ArrayAdapter<String>(getApplicationContext(),
@@ -419,7 +641,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 		Spinner spinnerParkingSpaces = (Spinner)dialoglayout.findViewById(R.id.viewparking_spn_space);
     	spinnerParkingSpaces.setAdapter(adapterSpaces);
-				
+    	
 		Button btnCheckInOut = (Button)dialoglayout.findViewById(R.id.viewparking_id_checkin);
 		btnCheckInOut.setOnClickListener(new CheckInOutOnClickListener());
 		
@@ -429,6 +651,18 @@ public class ViewParkingMapActivity extends MapActivity {
 		Button btnGetDirections = (Button)dialoglayout.findViewById(R.id.viewparking_id_getdirections);
 		btnGetDirections.setOnClickListener(new GetDirectionsOnClickListener());
 		
+		TextView tvStatus = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_status);
+    	
+    	if (checkedIn) {
+    		tvStatus.setText("Checked into space " + checkedInSpaceId + ", " + checkedInType +
+    				" lot " + checkedInLotId);
+    		
+    		btnCheckInOut.setText("Check Out of Space");
+    	}
+    	else {
+    		tvStatus.setText("Not checked into a space");
+    	}
+    	
 		dialog.show();
 	}
 	
@@ -436,17 +670,49 @@ public class ViewParkingMapActivity extends MapActivity {
 	{
 		public void onClick(View view)
 		{
-			dialog.getLayoutInflater().inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
+			TextView tvError = (TextView)dialog.findViewById(R.id.viewmap_dlg_error);
 			
-			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+			Spinner spinnerParkingSpaces = (Spinner)dialog.findViewById(R.id.viewparking_spn_space);
+			String selectedSpaceId = (String)spinnerParkingSpaces.getSelectedItem();
 			
-			if (lastKnownLocation != null)
+			if (!checkedIn)
 			{
-				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
-						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+				Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+				
+				if (lastKnownLocation != null)
+				{
+					double currentLat = lastKnownLocation.getLatitude();
+					double currentLng = lastKnownLocation.getLongitude();
+					double lotBound1Lat = selectedLot.getBoundaries().get(0).getLatitudeE6() / 1E6;
+					double lotBound1Lng = selectedLot.getBoundaries().get(0).getLongitudeE6() / 1E6;
+					double lotBound3Lat = selectedLot.getBoundaries().get(2).getLatitudeE6() / 1E6;
+					double lotBound3Lng = selectedLot.getBoundaries().get(2).getLongitudeE6() / 1E6;
+					
+					if (currentLat < lotBound1Lat && currentLng > lotBound1Lng &&
+						currentLat > lotBound3Lat && currentLng < lotBound3Lng) {						
+												
+							updateCurrentStatus(clientEmail, "0", selectedSpaceId, Integer.toString(selectedLot.getLotId()));
+							dialog.dismiss();
+					}
+					else {
+						
+						tvError.setText("You must be closer to the parking lot before checking into a parking space.");
+					}
+				}
+				else {
+					
+					tvError.setText("Unable to get your current location. Try again later.");
+				}
 			}
-			
-			dialog.dismiss();
+			else {
+				
+				tempLotId = Integer.toString(selectedLot.getLotId());
+				tempSpaceId = selectedSpaceId;
+				tempType = selectedLot.isStudent() ? "student" : "faculty";
+				
+				updateCurrentStatus("", "1", selectedSpaceId, Integer.toString(selectedLot.getLotId()));
+				dialog.dismiss();
+			}			
 		}
 	}
 	
@@ -804,6 +1070,87 @@ public class ViewParkingMapActivity extends MapActivity {
             
             fillPaint = new Paint();
             fillPaint.setColor(getResources().getColor(R.color.uco_yellow));            
+			fillPaint.setAntiAlias(false);
+            fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            fillPaint.setStrokeJoin(Paint.Join.ROUND);
+            fillPaint.setStrokeCap(Paint.Cap.ROUND);
+            fillPaint.setStrokeWidth(1);
+            fillPaint.setAlpha(160);	
+		}
+		
+		public void draw(Canvas canvas, MapView mapv, boolean shadow) {
+    		
+			super.draw(canvas, mapv, shadow);
+    		
+			if (shadow == false)
+			{
+	    		if (!isInitialized)
+	    		{
+	    			this.init();
+	    			this.isInitialized = true;
+	    		}
+	    		
+	    		spacePath = new Path();
+	    		
+	    		Point coordInitial = new Point();
+	    		Point coordPoint = new Point();
+	    		
+	    		projection.toPixels(gp1, coordInitial);
+    			spacePath.moveTo(coordInitial.x, coordInitial.y);
+    			
+    			projection.toPixels(gp2, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp3, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			
+    			projection.toPixels(gp4, coordPoint);
+    			spacePath.lineTo(coordPoint.x, coordPoint.y);
+    			spacePath.lineTo(coordInitial.x, coordInitial.y);
+    			
+    			spacePath.close();
+    			
+    			canvas.drawPath(spacePath, strokePaint);            
+                canvas.drawPath(spacePath, fillPaint);
+			}
+		}
+	}
+	
+	public class CurrentParkingSpaceOverlay extends Overlay
+	{
+		private boolean isInitialized = false;
+		
+		private GeoPoint gp1;
+	    private GeoPoint gp2;
+	    private GeoPoint gp3;
+	    private GeoPoint gp4;
+	    
+		private Paint fillPaint;
+		private Paint strokePaint;
+    	private Path spacePath;
+    	
+    	public CurrentParkingSpaceOverlay(GeoPoint corner1, GeoPoint corner2,
+    			GeoPoint corner3, GeoPoint corner4)
+    	{
+    		gp1 = corner1;
+    		gp2 = corner2;
+    		gp3 = corner3;
+    		gp4 = corner4;
+    	}
+    	
+		private void init()
+		{
+			strokePaint = new Paint();
+			strokePaint.setAntiAlias(true);
+            strokePaint.setColor(getResources().getColor(R.color.brightgreen));
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeWidth(1);
+            strokePaint.setAlpha(200);
+            
+            fillPaint = new Paint();
+            fillPaint.setColor(getResources().getColor(R.color.brightgreen));            
 			fillPaint.setAntiAlias(false);
             fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             fillPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -1340,6 +1687,74 @@ public class ViewParkingMapActivity extends MapActivity {
 		}
 	}
 	
+	private class CheckedInJSONArrayListener implements GetJSONListener {
+    	
+	    public void onRemoteCallComplete(JSONArray jArray) {
+	    	
+	    	try	{
+	    		
+	    		if (jArray != null) {
+	    			
+	    			if (jArray.length() > 0) {
+	    				
+	    				JSONObject json_data = jArray.getJSONObject(0);
+	    				
+	    				checkedInSpaceId = json_data.getString("spaceid");
+	    				checkedInLotId = json_data.getString("parkinglot_lotid");
+	    				
+	    				boolean isStudent = ((ParkingApplication)getApplication()).BooleanFromInt(json_data.getInt("studentlot"));
+	    				
+	    				checkedInType = isStudent ? "student" : "faculty";
+	    				checkedIn = true;
+	    				
+	    			}
+	    			else {
+		    			
+		    			checkedIn = false;
+		    		}
+	    		}
+	    		
+	    	} catch (JSONException e) {
+	    		
+	    		e.printStackTrace();
+	    	}
+	    }
+	    
+	    public void onRemoteCallComplete(JSONObject jObject) {}
+    }
+
+	private class UpdateStatusJSONArrayListener implements GetJSONListener {
+    	
+	    public void onRemoteCallComplete(JSONArray jArray) {
+	    	
+	    	try	{
+	    		
+	    		if (jArray != null) {
+	    			
+	    			if (checkedIn) {
+	    				
+	    				checkedIn = false;
+	    				checkedInSpaceId = "";
+	    				checkedInLotId = "";
+	    				resetOverlays();
+	    			}
+	    			else {
+	    				
+	    				checkedIn = true;
+	    				checkedInSpaceId = tempSpaceId;
+	    				checkedInLotId = tempLotId;
+	    				checkedInType = tempType;
+	    				resetOverlays();
+	    			}
+	    		}
+	    	} catch (Exception e) {
+	    		
+	    	}
+	    }
+	    
+	    public void onRemoteCallComplete(JSONObject jObject) {}
+    }
+
 	private List<GeoPoint> decodePoly(String encoded) {
 
 	    List<GeoPoint> poly = new ArrayList<GeoPoint>();

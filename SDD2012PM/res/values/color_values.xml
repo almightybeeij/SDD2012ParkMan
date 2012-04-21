@@ -10,4 +10,5 @@
 	<color name="transparent">#80000000</color>
 	<color name="uco_yellow">#ffd200</color>
 	<color name="uco_blue">#003366</color>
+	<color name="brightgreen">#00e800</color>
 </resources>

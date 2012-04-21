@@ -22,7 +22,12 @@ import android.app.Application;
 public class ParkingApplication extends Application {
 
 	private int resultCloseAll;
+	private int resultClose;
 	private int resultUpdate;
+	
+	private String userEmail;
+	private String userFirstName;
+	private String userLastName;
 	
 	public int getResultCloseAll() {		
 		return resultCloseAll;
@@ -32,12 +37,44 @@ public class ParkingApplication extends Application {
 		this.resultCloseAll = resultCloseAll;
 	}
 	
+	public int getResultClose() {
+		return resultClose;
+	}
+
+	public void setResultClose(int resultClose) {
+		this.resultClose = resultClose;
+	}
+
 	public int getResultUpdate() {
 		return resultUpdate;
 	}
 
 	public void setResultUpdate(int resultUpdate) {
 		this.resultUpdate = resultUpdate;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
+	public String getUserFirstName() {
+		return userFirstName;
+	}
+
+	public void setUserFirstName(String userFirstName) {
+		this.userFirstName = userFirstName;
+	}
+
+	public String getUserLastName() {
+		return userLastName;
+	}
+
+	public void setUserLastName(String userLastName) {
+		this.userLastName = userLastName;
 	}
 
 	public boolean BooleanFromInt(int value) {

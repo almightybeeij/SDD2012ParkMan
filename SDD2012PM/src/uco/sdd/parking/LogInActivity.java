@@ -37,21 +37,22 @@ public class LogInActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
         ((ParkingApplication)getApplication()).setResultCloseAll(0);
+        ((ParkingApplication)getApplication()).setResultClose(2);
         ((ParkingApplication)getApplication()).setResultUpdate(5);
     }
     
     public void logInOnClick(View view) {
     	
-    	TextView tv_test = (TextView)findViewById(R.id.login_txt_error);
-    	EditText et_email = (EditText)this.findViewById(R.id.login_txt_email);
-    	EditText et_password = (EditText)this.findViewById(R.id.login_txt_password);
+    	TextView tvError = (TextView)findViewById(R.id.login_txt_error);
+    	EditText etEmail = (EditText)this.findViewById(R.id.login_txt_email);
+    	EditText etPassword = (EditText)this.findViewById(R.id.login_txt_password);
     	
-    	String email = et_email.getText().toString();
-    	String password = et_password.getText().toString();
+    	String email = etEmail.getText().toString();
+    	String password = etPassword.getText().toString();
     	
     	if ((email.trim().length() == 0) || (password.trim().length() == 0)) {
     		
-    		tv_test.setText(getString(R.string.login_msg_required));
+    		tvError.setText(getString(R.string.login_msg_required));
     		return;
     	}
     	
@@ -87,9 +88,10 @@ public class LogInActivity extends Activity {
 				        	String lastName = json_data.getString("lastName");
 				        	
 				        	Intent i = new Intent(getApplicationContext(), MainActivity.class);
-				        	i.putExtra("email", email);
-				        	i.putExtra("firstName", firstName);
-					    	i.putExtra("lastName", lastName);
+					    	
+					    	((ParkingApplication)getApplication()).setUserEmail(email);
+					    	((ParkingApplication)getApplication()).setUserFirstName(firstName);
+					    	((ParkingApplication)getApplication()).setUserLastName(lastName);
 					    	
 					    	startActivityForResult(i, ((ParkingApplication)getApplication()).getResultCloseAll());
 					    	
@@ -114,11 +116,22 @@ public class LogInActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	
     	int closeAll = ((ParkingApplication)getApplication()).getResultCloseAll();
+    	int close = ((ParkingApplication)getApplication()).getResultClose();
     	
         if (resultCode == closeAll) {
         	
         	setResult(closeAll);
         	finish();
+        }
+        else if (resultCode == close) {
+        	
+        	setResult(close);
+        	
+        	EditText etEmail = (EditText)this.findViewById(R.id.login_txt_email);
+        	EditText etPassword = (EditText)this.findViewById(R.id.login_txt_password);
+        	
+        	etEmail.setText("");
+        	etPassword.setText("");
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

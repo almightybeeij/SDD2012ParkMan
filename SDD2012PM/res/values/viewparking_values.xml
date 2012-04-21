@@ -9,11 +9,20 @@
     <string name="viewparking_smt_spacecoord">
         select * from parkingspace where parkinglot_lotid = ?
     </string>
+    <string name="viewparking_smt_checkin">
+        update parkingspace set client_email = ?, available = ? where spaceid = ? and parkinglot_lotid = ?
+    </string>
+    <string name="viewparking_smt_checkin_types">siii</string>
+    <string name="viewparking_smt_checkout">
+        update parkingspace set client_email = null, available = ? where spaceid = ? and parkinglot_lotid = ?
+    </string>
+    <string name="viewparking_smt_checkout_types">iii</string>
     <string name="viewparking_smt_spacecoord_types">i</string>
     <string name="viewparking_btn_satellite">Satellite View</string>
     <string name="viewparking_btn_street">Street View</string>
     <string name="viewparking_btn_getdirections">Get Directions</string>
     <string name="viewparking_btn_checkin">Check Into Space</string>
     <string name="viewparking_btn_viewspace">View In Map</string>
+    <string name="viewparking_lbl_status">Your Current Status:</string>
     <string name="viewparking_lbl_space">Select Parking Space</string>
 </resources>

@@ -43,17 +43,12 @@ public class MainActivity extends ListActivity {
         String[] menuItems = getResources().getStringArray(R.array.main_mnu_items);
         setListAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, menuItems));
         
-        Bundle extras = getIntent().getExtras();
+        clientEmail = ((ParkingApplication)getApplication()).getUserEmail();
+    	String fName = ((ParkingApplication)getApplication()).getUserFirstName();
+    	String lName = ((ParkingApplication)getApplication()).getUserLastName();
     
-        if (extras != null) {
-        	
-        	clientEmail = extras.getString("email");
-        	String fName = extras.getString("firstName");
-        	String lName = extras.getString("lastName");
-        
-        	TextView tv_Welcome = (TextView)findViewById(R.id.main_tvw_welcome);
-        	tv_Welcome.setText("Welcome Back " + fName + " " + lName + "!");
-        }
+    	TextView tv_Welcome = (TextView)findViewById(R.id.main_tvw_welcome);
+    	tv_Welcome.setText("Welcome Back " + fName + " " + lName + "!");
         
         if (clientEmail != null) {
         	
@@ -111,13 +106,17 @@ public class MainActivity extends ListActivity {
 				i = null;
 				break;
 			case 2:
+				this.setResult(((ParkingApplication)getApplication()).getResultClose());
+				this.finish();
+				break;
+			case 3:
 				this.setResult(((ParkingApplication)getApplication()).getResultCloseAll());
 				this.finish();
 				break;
 		}
 	}
     
-    private class CheckedInJSONArrayListener implements GetJSONListener {
+    public class CheckedInJSONArrayListener implements GetJSONListener {
     	
 	    public void onRemoteCallComplete(JSONArray jArray) {
 	    	

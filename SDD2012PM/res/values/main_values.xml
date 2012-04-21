@@ -6,6 +6,7 @@
     <string-array name="main_mnu_items">
         <item>View Parking Map</item>
         <item>Search for Parking</item>
+        <item>Log Out</item>
         <item>Quit</item>
     </string-array>
     <string name="main_smt_checkedin">

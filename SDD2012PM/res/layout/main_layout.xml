@@ -30,7 +30,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="10sp"
         android:paddingBottom="10sp"
-        android:paddingLeft="10sp"
         android:textColor="@color/uco_yellow"
         android:gravity="center_vertical|center_horizontal" />
         

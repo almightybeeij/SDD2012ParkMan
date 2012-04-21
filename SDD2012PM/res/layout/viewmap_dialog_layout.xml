@@ -5,6 +5,28 @@
     android:orientation="vertical"
     android:padding="10sp" >
     
+    <TextView android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/viewmap_dlg_error"
+	    android:paddingTop="5sp"
+	    android:textSize="7dp"
+	    android:layout_marginLeft="2dp" />
+    
+    <TextView android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/viewmap_dlg_statuslbl"
+	    android:paddingTop="5sp"
+	    android:text="@string/viewparking_lbl_status"
+	    android:layout_marginLeft="2dp" />
+    
+    <TextView android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/viewmap_dlg_status"
+	    android:paddingTop="1sp"
+	    android:layout_marginLeft="2dp"
+	    android:layout_marginBottom="10dp"
+	    android:textColor="@color/uco_yellow" />
+    
 	<TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:id="@+id/viewmap_dlg_test"
