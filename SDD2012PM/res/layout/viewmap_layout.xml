@@ -34,6 +34,14 @@
 	    android:layout_margin="0dp"
 	    android:layout_marginTop="5sp" />
    	
+   	<Button android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="@string/viewparking_btn_turnbyturn"
+	    android:id="@+id/viewparking_btn_tbt"
+	    android:onClick="mapButtonOnClick"
+	    android:layout_margin="0dp"
+	    android:layout_marginTop="5sp" />
+   	
 	</LinearLayout>	
 	
 </RelativeLayout>

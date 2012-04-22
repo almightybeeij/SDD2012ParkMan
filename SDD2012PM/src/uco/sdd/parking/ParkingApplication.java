@@ -17,6 +17,8 @@
 
 package uco.sdd.parking;
 
+import java.util.ArrayList;
+
 import android.app.Application;
 
 public class ParkingApplication extends Application {
@@ -28,6 +30,15 @@ public class ParkingApplication extends Application {
 	private String userEmail;
 	private String userFirstName;
 	private String userLastName;
+	
+	private ArrayList<RouteStep> steps;
+	
+	public void onCreate()
+	{
+		super.onCreate();
+		
+		steps = new ArrayList<RouteStep>();
+	}
 	
 	public int getResultCloseAll() {		
 		return resultCloseAll;
@@ -75,6 +86,14 @@ public class ParkingApplication extends Application {
 
 	public void setUserLastName(String userLastName) {
 		this.userLastName = userLastName;
+	}
+
+	public ArrayList<RouteStep> getSteps() {
+		return steps;
+	}
+
+	public void setSteps(ArrayList<RouteStep> steps) {
+		this.steps = steps;
 	}
 
 	public boolean BooleanFromInt(int value) {

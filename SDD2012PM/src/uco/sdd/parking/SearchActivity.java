@@ -67,6 +67,13 @@ public class SearchActivity extends Activity {
     	dac.executeSelect();
 	}
 
+	@Override
+	public void onBackPressed()	{
+		
+		this.setResult(((ParkingApplication)getApplication()).getResultUpdate());
+		super.onBackPressed();
+	}
+	
 	public void searchOnClick(View view) {
 		
 		HTTPDataAccess dac = new HTTPDataAccess(this,
@@ -171,6 +178,9 @@ public class SearchActivity extends Activity {
 			 
 			try	{
 				
+				parkingTypes = new ArrayList<String>();
+				Spinner spinnerParkingTypes = (Spinner)findViewById(R.id.search_spn_parkingtype);
+				
 	    		if (jArray != null)	{
 	    			
 	    			if (jArray.length() > 0) {
@@ -188,16 +198,19 @@ public class SearchActivity extends Activity {
 				    		{
 				    			parkingTypes.add("Faculty");
 				    		}
-				    	}
-				    	
-				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+				    		spinnerParkingTypes.setEnabled(true);
+				    	}				    	
+	    			}
+	    			else {
+	    				
+	    				spinnerParkingTypes.setEnabled(false);
+	    			}
+	    			
+	    			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
 				    		R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingTypes);
 				    	
-				    	Spinner spinnerParkingTypes = (Spinner)findViewById(R.id.search_spn_parkingtype);
-				    	spinnerParkingTypes.setAdapter(adapter);
-				    	spinnerParkingTypes.setOnItemSelectedListener(new OnParkingTypeItemSelectedListener());
-				    	spinnerParkingTypes.setEnabled(true);
-	    			}
+				    spinnerParkingTypes.setAdapter(adapter);
+				    spinnerParkingTypes.setOnItemSelectedListener(new OnParkingTypeItemSelectedListener());
 	    		}
 	    	} catch (JSONException e) {
 	    		
@@ -214,6 +227,9 @@ public class SearchActivity extends Activity {
 			 
 			try {
 				
+				parkingLots = new ArrayList<String>();
+				Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
+				
 	    		if (jArray != null) {
 	    			
 	    			if (jArray.length() > 0) {
@@ -223,16 +239,20 @@ public class SearchActivity extends Activity {
 				    		JSONObject json_data = jArray.getJSONObject(index);
 				    		parkingLots.add("Parking Lot " + json_data.getString("lotid"));
 				    	}
-				    	
-				    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-				    		R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
-				    	
-				    	Spinner spinnerParkingLots = (Spinner)findViewById(R.id.search_spn_parkinglot);
-				    	spinnerParkingLots.setAdapter(adapter);
-				    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
-				    	spinnerParkingLots.setEnabled(true);
+	    				spinnerParkingLots.setEnabled(true);
+	    			}
+	    			else {
+	    				
+	    				spinnerParkingLots.setEnabled(false);
 	    			}
 	    		}
+	    		
+	    		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+			    		R.layout.search_spinner_item, R.id.search_spn_itemtext, parkingLots);
+			    	
+		    	spinnerParkingLots.setAdapter(adapter);
+		    	spinnerParkingLots.setOnItemSelectedListener(new OnParkingLotItemSelectedListener());
+		    	
 	    	} catch (JSONException e) {
 	    		
 	    		e.printStackTrace();
@@ -266,7 +286,7 @@ public class SearchActivity extends Activity {
 	    			}
 	    			else {
 	    				
-	    				setErrorMessage("No results found. Please try again.");
+	    				setErrorMessage(getResources().getString(R.string.search_msg_noresults));
 	    			}
 	    		}
 	    	} catch (JSONException e) {

@@ -25,4 +25,11 @@
     <string name="viewparking_btn_viewspace">View In Map</string>
     <string name="viewparking_lbl_status">Your Current Status:</string>
     <string name="viewparking_lbl_space">Select Parking Space</string>
+    <string name="viewparking_msg_closer">
+        You must be closer to the parking lot\nbefore checking into a parking space.
+    </string>
+    <string name="viewparking_msg_nolocation">
+        Unable to get your current location. Try again later.
+    </string>
+    <string name="viewparking_btn_turnbyturn">Turn-by-Turn</string>
 </resources>

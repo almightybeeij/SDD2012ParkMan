@@ -102,7 +102,7 @@ public class MainActivity extends ListActivity {
 				break;
 			case 1:
 				i = new Intent(getApplicationContext(), SearchActivity.class);
-				startActivity(i);
+				startActivityForResult(i, ((ParkingApplication)getApplication()).getResultUpdate());
 				i = null;
 				break;
 			case 2:

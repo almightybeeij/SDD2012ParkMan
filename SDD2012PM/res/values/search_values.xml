@@ -29,4 +29,5 @@
         select * from parkingspace where parkinglot_lotid = ? and available = ? limit 0,5
     </string>
     <string name="search_smt_parking_types">ii</string>
+    <string name="search_msg_noresults">No available spaces found. Please try again.</string>
 </resources>

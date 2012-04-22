@@ -30,6 +30,9 @@
         <activity android:name=".SearchResultsActivity"
             android:label="@string/app_name">            
         </activity>
+        <activity android:name=".ViewDirectionsActivity"
+            android:label="@string/app_name">            
+        </activity>
     </application>
     
 </manifest>

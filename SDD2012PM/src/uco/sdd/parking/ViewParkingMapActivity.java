@@ -37,6 +37,7 @@ import com.google.android.maps.Projection;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -62,6 +63,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	
 	private boolean viewSpace;
 	private boolean checkedIn;
+	private boolean refreshDialog;
+	private boolean showDirections;
 	
 	private String locationProvider;
 	private String viewSpaceId;
@@ -102,6 +105,8 @@ public class ViewParkingMapActivity extends MapActivity {
 	    
 	    viewSpace = false;
 	    checkedIn = false;
+	    refreshDialog = false;
+	    
 	    Criteria criteria = new Criteria();
 	    criteria.setAccuracy(Criteria.ACCURACY_FINE);
 	    
@@ -185,6 +190,12 @@ public class ViewParkingMapActivity extends MapActivity {
 			{
 				mapView.setSatellite(false);
 				mapView.setStreetView(true);
+			}
+			case R.id.viewparking_btn_tbt:
+			{
+				Intent i = new Intent(getApplicationContext(), ViewDirectionsActivity.class);
+				startActivity(i);
+				i = null;
 			}
 		}
 	}
@@ -599,6 +610,14 @@ public class ViewParkingMapActivity extends MapActivity {
 		LayoutInflater inflater = getLayoutInflater();		
 		View dialoglayout = inflater.inflate(R.layout.viewmap_dialog_layout, (ViewGroup) getCurrentFocus());
 
+		if (refreshDialog) {
+			
+			refreshDialog = false;
+			dialog = new AlertDialog.Builder(this).create();
+			TextView tvError = (TextView)dialoglayout.findViewById(R.id.viewmap_dlg_error);
+			tvError.setVisibility(1);
+		}
+		
 		dialog.setView(dialoglayout);
 		
 		if (lot.isStudent()) {
@@ -618,8 +637,8 @@ public class ViewParkingMapActivity extends MapActivity {
 					if (count <= 10 && space.isAvailable()) {
 					
 						parkingSpaces.add(Integer.toString(space.getSpaceId()));
+						count++;
 					}
-					count++;
 				}
 			}
 			else {
@@ -688,20 +707,30 @@ public class ViewParkingMapActivity extends MapActivity {
 					double lotBound3Lat = selectedLot.getBoundaries().get(2).getLatitudeE6() / 1E6;
 					double lotBound3Lng = selectedLot.getBoundaries().get(2).getLongitudeE6() / 1E6;
 					
-					if (currentLat < lotBound1Lat && currentLng > lotBound1Lng &&
-						currentLat > lotBound3Lat && currentLng < lotBound3Lng) {						
-												
+					//if (currentLat < lotBound1Lat && currentLng > lotBound1Lng &&
+					//	currentLat > lotBound3Lat && currentLng < lotBound3Lng) {						
+					if (lastKnownLocation != null) {
+						
 							updateCurrentStatus(clientEmail, "0", selectedSpaceId, Integer.toString(selectedLot.getLotId()));
+							
+							tempLotId = Integer.toString(selectedLot.getLotId());
+							tempSpaceId = selectedSpaceId;
+							tempType = selectedLot.isStudent() ? "student" : "faculty";
+							
 							dialog.dismiss();
 					}
 					else {
 						
-						tvError.setText("You must be closer to the parking lot before checking into a parking space.");
+						tvError.setText(getResources().getString(R.string.viewparking_msg_closer));
+						tvError.setVisibility(0);
+						refreshDialog = true;
 					}
 				}
 				else {
 					
-					tvError.setText("Unable to get your current location. Try again later.");
+					tvError.setText(getResources().getString(R.string.viewparking_msg_nolocation));
+					tvError.setVisibility(0);
+					refreshDialog = true;
 				}
 			}
 			else {
@@ -740,6 +769,11 @@ public class ViewParkingMapActivity extends MapActivity {
 			if (lastKnownLocation != null)
 			{
 				//selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
+				
+				directions = new Route();
+				((ParkingApplication)getApplication()).getSteps().clear();
+				
+				resetOverlays();
 				
 				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
 						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
@@ -1676,6 +1710,7 @@ public class ViewParkingMapActivity extends MapActivity {
 				    		directions.getSteps().add(step);
 				    	}
 			    		
+			    		((ParkingApplication)getApplication()).setSteps(directions.getSteps());
 			    		addDirections();
 	    			}
 	    		}
@@ -1736,6 +1771,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    				checkedIn = false;
 	    				checkedInSpaceId = "";
 	    				checkedInLotId = "";
+	    				refreshDialog = true;
 	    				resetOverlays();
 	    			}
 	    			else {
@@ -1744,6 +1780,7 @@ public class ViewParkingMapActivity extends MapActivity {
 	    				checkedInSpaceId = tempSpaceId;
 	    				checkedInLotId = tempLotId;
 	    				checkedInType = tempType;
+	    				refreshDialog = true;
 	    				resetOverlays();
 	    			}
 	    		}

@@ -8,9 +8,10 @@
     <TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:id="@+id/viewmap_dlg_error"
-	    android:paddingTop="5sp"
-	    android:textSize="7dp"
-	    android:layout_marginLeft="2dp" />
+	    android:textColor="@color/red"
+	    android:layout_marginLeft="2dp"
+	    android:layout_marginBottom="5dp"
+	    android:visibility="invisible" />
     
     <TextView android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
