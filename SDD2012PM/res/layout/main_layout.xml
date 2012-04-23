@@ -18,7 +18,7 @@
 	    android:layout_height="0dp"
 	    android:layout_weight="1"
 	    android:headerDividersEnabled="true" />
-
+    
     <ImageView android:src="@android:drawable/divider_horizontal_dark"
         android:contentDescription="@string/main_img_desc_divider"
 	    android:layout_width="fill_parent"
