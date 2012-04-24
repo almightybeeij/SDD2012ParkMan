@@ -64,7 +64,6 @@ public class ViewParkingMapActivity extends MapActivity {
 	private boolean viewSpace;
 	private boolean checkedIn;
 	private boolean refreshDialog;
-	private boolean showDirections;
 	
 	private String locationProvider;
 	private String viewSpaceId;
@@ -190,12 +189,14 @@ public class ViewParkingMapActivity extends MapActivity {
 			{
 				mapView.setSatellite(false);
 				mapView.setStreetView(true);
+				break;
 			}
 			case R.id.viewparking_btn_tbt:
 			{
 				Intent i = new Intent(getApplicationContext(), ViewDirectionsActivity.class);
 				startActivity(i);
 				i = null;
+				break;
 			}
 		}
 	}
@@ -707,9 +708,9 @@ public class ViewParkingMapActivity extends MapActivity {
 					double lotBound3Lat = selectedLot.getBoundaries().get(2).getLatitudeE6() / 1E6;
 					double lotBound3Lng = selectedLot.getBoundaries().get(2).getLongitudeE6() / 1E6;
 					
-					//if (currentLat < lotBound1Lat && currentLng > lotBound1Lng &&
-					//	currentLat > lotBound3Lat && currentLng < lotBound3Lng) {						
-					if (lastKnownLocation != null) {
+					if (currentLat < lotBound1Lat && currentLng > lotBound1Lng &&
+						currentLat > lotBound3Lat && currentLng < lotBound3Lng) {						
+					//if (lastKnownLocation != null) {
 						
 							updateCurrentStatus(clientEmail, "0", selectedSpaceId, Integer.toString(selectedLot.getLotId()));
 							
@@ -767,16 +768,16 @@ public class ViewParkingMapActivity extends MapActivity {
 			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 			
 			if (lastKnownLocation != null)
-			{
-				//selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
-				
+			{				
 				directions = new Route();
 				((ParkingApplication)getApplication()).getSteps().clear();
 				
 				resetOverlays();
 				
-				selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
-						"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+				//selectDirections(Double.toString(lastKnownLocation.getLatitude()) +
+				//		"," + Double.toString(lastKnownLocation.getLongitude()), selectedLot.getDirectionTo());
+				
+				selectDirections("35.335293,-97.489929", selectedLot.getDirectionTo());
 			}
 			
 			dialog.dismiss();
